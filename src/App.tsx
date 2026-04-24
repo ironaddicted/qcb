@@ -164,8 +164,55 @@ const EstimateForm = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateStep = (currentStep: number) => {
+    const newErrors: Record<string, string> = {};
+
+    if (currentStep === 0) {
+      if (!formData.areaValue) {
+        newErrors.areaValue = 'Area value is required';
+      } else {
+        const value = parseFloat(formData.areaValue);
+        if (isNaN(value) || value <= 0) {
+          newErrors.areaValue = 'Please enter a valid positive number';
+        }
+      }
+    }
+
+    if (currentStep === 4) {
+      if (!formData.name.trim()) {
+        newErrors.name = 'Full name is required';
+      }
+      
+      const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+      if (!formData.phone.trim()) {
+        newErrors.phone = 'Phone number is required';
+      } else if (!phoneRegex.test(formData.phone)) {
+        newErrors.phone = 'Please enter a valid US phone number (e.g., 704-555-0123)';
+      }
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!formData.email.trim()) {
+        newErrors.email = 'Email address is required';
+      } else if (!emailRegex.test(formData.email)) {
+        newErrors.email = 'Please enter a valid email address';
+      }
+
+      if (!formData.zip.trim()) {
+        newErrors.zip = 'Zip code is required';
+      } else if (!/^\d{5}(-\d{4})?$/.test(formData.zip)) {
+        newErrors.zip = 'Please enter a valid zip code';
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const nextStep = () => {
+    if (!validateStep(step)) return;
+
     if (step === 2 && formData.tileType === 'solid') {
       setStep(4);
     } else {
@@ -182,6 +229,7 @@ const EstimateForm = () => {
   };
 
   const handleSubmit = async () => {
+    if (!validateStep(4)) return;
     setIsSubmitting(true);
     try {
       const response = await fetch('https://htmczrw2tgityftpxj5535hdye0zreqf.lambda-url.us-east-1.on.aws', {
@@ -242,10 +290,14 @@ const EstimateForm = () => {
               <input 
                 type="number"
                 value={formData.areaValue}
-                onChange={(e) => setFormData({...formData, areaValue: e.target.value})}
+                onChange={(e) => {
+                  setFormData({...formData, areaValue: e.target.value});
+                  if (errors.areaValue) setErrors({...errors, areaValue: ''});
+                }}
                 placeholder={formData.areaType === 'sqft' ? 'e.g. 35' : 'e.g. 6'}
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-900 transition-all"
+                className={`w-full px-4 py-3 rounded-xl border ${errors.areaValue ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-200 focus:ring-slate-900/20 focus:border-slate-900'} focus:outline-none focus:ring-2 transition-all`}
               />
+              {errors.areaValue && <p className="text-red-500 text-xs mt-1 font-medium">{errors.areaValue}</p>}
             </div>
           </div>
         );
@@ -386,9 +438,13 @@ const EstimateForm = () => {
                   type="text"
                   required
                   value={formData.name}
-                  onChange={(e) => setFormData({...formData, name: e.target.value})}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-900 transition-all"
+                  onChange={(e) => {
+                    setFormData({...formData, name: e.target.value});
+                    if (errors.name) setErrors({...errors, name: ''});
+                  }}
+                  className={`w-full px-4 py-3 rounded-xl border ${errors.name ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-200 focus:ring-slate-900/20 focus:border-slate-900'} focus:outline-none focus:ring-2 transition-all`}
                 />
+                {errors.name && <p className="text-red-500 text-xs mt-1 font-medium">{errors.name}</p>}
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Phone Number</label>
@@ -396,19 +452,27 @@ const EstimateForm = () => {
                   type="tel"
                   required
                   value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-900 transition-all"
+                  onChange={(e) => {
+                    setFormData({...formData, phone: e.target.value});
+                    if (errors.phone) setErrors({...errors, phone: ''});
+                  }}
+                  className={`w-full px-4 py-3 rounded-xl border ${errors.phone ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-200 focus:ring-slate-900/20 focus:border-slate-900'} focus:outline-none focus:ring-2 transition-all`}
                 />
+                {errors.phone && <p className="text-red-500 text-xs mt-1 font-medium">{errors.phone}</p>}
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Zip Code</label>
                 <input
-                  type="zip"
+                  type="text"
                   required
                   value={formData.zip}
-                  onChange={(e) => setFormData({...formData, zip: e.target.value})}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-900 transition-all"
+                  onChange={(e) => {
+                    setFormData({...formData, zip: e.target.value});
+                    if (errors.zip) setErrors({...errors, zip: ''});
+                  }}
+                  className={`w-full px-4 py-3 rounded-xl border ${errors.zip ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-200 focus:ring-slate-900/20 focus:border-slate-900'} focus:outline-none focus:ring-2 transition-all`}
                 />
+                {errors.zip && <p className="text-red-500 text-xs mt-1 font-medium">{errors.zip}</p>}
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700">Email Address</label>
@@ -416,9 +480,13 @@ const EstimateForm = () => {
                   type="email"
                   required
                   value={formData.email}
-                  onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-900/20 focus:border-slate-900 transition-all"
+                  onChange={(e) => {
+                    setFormData({...formData, email: e.target.value});
+                    if (errors.email) setErrors({...errors, email: ''});
+                  }}
+                  className={`w-full px-4 py-3 rounded-xl border ${errors.email ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-200 focus:ring-slate-900/20 focus:border-slate-900'} focus:outline-none focus:ring-2 transition-all`}
                 />
+                {errors.email && <p className="text-red-500 text-xs mt-1 font-medium">{errors.email}</p>}
               </div>
             </div>
           </div>
