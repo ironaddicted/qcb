@@ -5,10 +5,12 @@
 
 import React, { useState, useRef} from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import StaggeredIcon from '../public/assets/staggered.svg';
-import StackedIcon from '../public/assets/stacked.svg';
-import HerringboneIcon from '../public/assets/herringbone.svg';
-import MosaicIcon from '../public/assets/mosaic.svg'
+
+const StaggeredIcon = '/assets/staggered.svg';
+const StackedIcon = '/assets/stacked.svg';
+const HerringboneIcon = '/assets/herringbone.svg';
+const MosaicIcon = '/assets/mosaic.svg';
+
 import { 
   ChevronRight, 
   ChevronLeft, 
@@ -48,14 +50,14 @@ interface FormData {
 
 // --- Constants ---
 const GALLERY_SAMPLES = [
-  { id: 1, title: 'Vibrant Green Subway', type: 'Ceramic', url: '/src/assets/green_glass.jpg' },
-  { id: 2, title: 'Modern Checkerboard', type: 'Porcelain', url: '/src/assets/g_combined_white_grey_zellenge.jpg' },
-  { id: 3, title: 'Seamless Quartz Panel', type: 'Quartz', url: '/src/assets/g_pvc_backsplash.jpg' },
-  { id: 4, title: 'Artisan Green Square', type: 'Ceramic', url: '/src/assets/g_zellige_green.jpg' },
-  { id: 5, title: 'Classic White Subway', type: 'Ceramic', url: '/src/assets/gen_2.png' },
-  { id: 6, title: 'Emerald Glass Subway', type: 'Glass', url: '/src/assets/emerald_sub.png' },
-  { id: 7, title: 'Herringbone', type: 'Ceramic Herringbone', url: '/src/assets/black_herringbone.png' },
-  { id: 8, title: 'Penny Tile', type: 'Porcelain', url: '/src/assets/penny_tile.png' }
+  { id: 1, title: 'Vibrant Green Subway', type: 'Ceramic', url: '/assets/green_glass.jpg' },
+  { id: 2, title: 'Modern Checkerboard', type: 'Porcelain', url: '/assets/g_combined_white_grey_zellenge.jpg' },
+  { id: 3, title: 'Seamless Quartz Panel', type: 'Quartz', url: '/assets/g_pvc_backsplash.jpg' },
+  { id: 4, title: 'Artisan Green Square', type: 'Ceramic', url: '/assets/g_zellige_green.jpg' },
+  { id: 5, title: 'Classic White Subway', type: 'Ceramic', url: '/assets/gen_2.png' },
+  { id: 6, title: 'Emerald Glass Subway', type: 'Glass', url: '/assets/emerald_sub.png' },
+  { id: 7, title: 'Herringbone', type: 'Ceramic Herringbone', url: '/assets/black_herringbone.png' },
+  { id: 8, title: 'Penny Tile', type: 'Porcelain', url: '/assets/penny_tile.png' }
 ];
 
 // --- Components ---
@@ -285,19 +287,19 @@ const EstimateForm = () => {
                   id: 'ceramic', 
                   label: 'Ceramic / Porcelain', 
                   desc: 'Durable, classic, and versatile',
-                  image: '/src/assets/ceramic_2.png'
+                  image: '/assets/ceramic_2.png'
                 },
                 { 
                   id: 'glass', 
                   label: 'Glass', 
                   desc: 'Modern, reflective, and easy to clean',
-                  image: '/src/assets/glass_selector.png'
+                  image: '/assets/glass_selector.png'
                 },
                 { 
                   id: 'solid', 
                   label: 'Solid Panel', 
                   desc: 'Seamless quartz or stone look',
-                  image: '/src/assets/solid_panel.png'
+                  image: '/assets/solid_panel.png'
                 }
               ].map((item) => (
                 <button 
