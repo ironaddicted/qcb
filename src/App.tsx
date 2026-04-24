@@ -29,7 +29,8 @@ import {
   ClipboardList,
   Hammer,
   Sparkles,
-  CheckCircle
+  CheckCircle,
+  X
 } from 'lucide-react';
 
 // --- Types ---
@@ -51,7 +52,7 @@ interface FormData {
 // --- Constants ---
 const GALLERY_SAMPLES = [
   { id: 1, title: 'Vibrant Green Subway', type: 'Ceramic', url: '/assets/green_glass.jpg' },
-  { id: 2, title: 'Modern Checkerboard', type: 'Porcelain', url: '/assets/g_combined_white_grey_zellenge.jpg' },
+  { id: 2, title: 'Modern Checkerboard', type: 'Porcelain', url: '/assets/g_combined_white_grey_zellenge.png' },
   { id: 3, title: 'Seamless Quartz Panel', type: 'Quartz', url: '/assets/g_pvc_backsplash.jpg' },
   { id: 4, title: 'Artisan Green Square', type: 'Ceramic', url: '/assets/g_zellige_green.jpg' },
   { id: 5, title: 'Classic White Subway', type: 'Ceramic', url: '/assets/gen_2.png' },
@@ -99,6 +100,7 @@ const Header = () => (
 
 const Gallery = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [selectedImage, setSelectedImage] = useState<typeof GALLERY_SAMPLES[0] | null>(null);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
@@ -106,6 +108,22 @@ const Gallery = () => {
       const scrollTo = direction === 'left' ? scrollLeft - clientWidth : scrollLeft + clientWidth;
       scrollRef.current.scrollTo({ left: scrollTo, behavior: 'smooth' });
     }
+  };
+
+  const handleNext = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (!selectedImage) return;
+    const currentIndex = GALLERY_SAMPLES.findIndex(img => img.id === selectedImage.id);
+    const nextIndex = (currentIndex + 1) % GALLERY_SAMPLES.length;
+    setSelectedImage(GALLERY_SAMPLES[nextIndex]);
+  };
+
+  const handlePrev = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (!selectedImage) return;
+    const currentIndex = GALLERY_SAMPLES.findIndex(img => img.id === selectedImage.id);
+    const prevIndex = (currentIndex - 1 + GALLERY_SAMPLES.length) % GALLERY_SAMPLES.length;
+    setSelectedImage(GALLERY_SAMPLES[prevIndex]);
   };
 
   return (
@@ -130,7 +148,11 @@ const Gallery = () => {
         className="flex gap-6 overflow-x-auto px-4 md:px-[calc((100vw-1280px)/2)] no-scrollbar snap-x snap-mandatory"
       >
         {GALLERY_SAMPLES.map((sample) => (
-          <div key={sample.id} className="min-w-[300px] md:min-w-[450px] aspect-[4/3] relative rounded-2xl overflow-hidden snap-start group">
+          <div 
+            key={sample.id} 
+            onClick={() => setSelectedImage(sample)}
+            className="min-w-[300px] md:min-w-[450px] aspect-[4/3] relative rounded-2xl overflow-hidden snap-start group cursor-pointer"
+          >
             <img 
               src={sample.url} 
               alt={sample.title} 
@@ -144,6 +166,69 @@ const Gallery = () => {
           </div>
         ))}
       </div>
+
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 p-4 md:p-12"
+            onClick={() => setSelectedImage(null)}
+          >
+            <button 
+              className="absolute top-6 right-6 text-white/70 hover:text-white transition-colors z-[110]"
+              onClick={() => setSelectedImage(null)}
+            >
+              <X className="w-8 h-8" />
+            </button>
+
+            {/* Navigation Arrows */}
+            <button 
+              className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors z-[110] hidden sm:block"
+              onClick={handlePrev}
+            >
+              <ChevronLeft className="w-12 h-12" />
+            </button>
+            <button 
+              className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors z-[110] hidden sm:block"
+              onClick={handleNext}
+            >
+              <ChevronRight className="w-12 h-12" />
+            </button>
+            
+            <motion.div
+              key={selectedImage.id}
+              initial={{ scale: 0.9, opacity: 0, x: 0 }}
+              animate={{ scale: 1, opacity: 1, x: 0 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.2}
+              onDragEnd={(_, info) => {
+                const threshold = 50;
+                if (info.offset.x < -threshold) {
+                  handleNext();
+                } else if (info.offset.x > threshold) {
+                  handlePrev();
+                }
+              }}
+              className="relative max-w-5xl w-full max-h-full flex flex-col items-center touch-none"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img 
+                src={selectedImage.url} 
+                alt={selectedImage.title}
+                className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl pointer-events-none"
+              />
+              <div className="mt-6 text-center">
+                <span className="text-brand-teal font-bold uppercase tracking-widest text-xs mb-2 block">{selectedImage.type}</span>
+                <h3 className="text-white text-3xl font-bold">{selectedImage.title}</h3>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 };
