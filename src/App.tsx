@@ -5,10 +5,10 @@
 
 import React, { useState, useRef} from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import StaggeredIcon from './assets/staggered.svg';
-import StackedIcon from './assets/stacked.svg';
-import HerringboneIcon from './assets/herringbone.svg';
-import MosaicIcon from './assets/mosaic.svg'
+import StaggeredIcon from '../public/assets/staggered.svg';
+import StackedIcon from '../public/assets/stacked.svg';
+import HerringboneIcon from '../public/assets/herringbone.svg';
+import MosaicIcon from '../public/assets/mosaic.svg'
 import { 
   ChevronRight, 
   ChevronLeft, 
