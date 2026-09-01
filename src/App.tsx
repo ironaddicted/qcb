@@ -38,16 +38,30 @@ type TileType = 'ceramic' | 'glass' | 'solid';
 type TilePattern = 'staggered' | 'stacked' | 'herringbone' | 'mosaic';
 
 interface FormData {
+  source?: string;
   areaType: 'sqft' | 'cabinets';
   areaValue: string;
   hasExisting: boolean;
   needsDemolition: boolean;
+  zip: string;
   tileType: TileType;
   pattern?: TilePattern;
   name: string;
   phone: string;
   email: string;
 }
+
+// --- Service Area Zip Codes (Charlotte NC +20 miles radius) ---
+// Leave the array empty for user to populate
+export const SERVICE_AREA_ZIP_CODES: (string | number)[] = [28202, 28203, 28204, 28205, 28206, 28207, 28208, 28209, 28210, 28211, 28212, 28213, 28214, 28215, 28216, 28217, 28226, 28227, 28262, 28269, 28270, 28273, 28277, 28104, 28105, 28134, 28031, 28036, 28078, 28110, 28111, 28112, 28173, 28103, 28174, 28025, 28026, 28027, 28081, 28083, 28075, 28144, 28146, 28023, 28115, 28117, 28625, 28677, 28092, 28093, 28037, 28052, 28054, 28056, 28012, 28120, 28150, 28152, 28001, 28097, 29730, 29732, 29707, 29708, 29715, 29745, 29710, 29720, 29706];
+
+export const isZipInServiceArea = (zip: string): boolean => {
+  if (!zip) return false;
+  const cleanZip = zip.trim().split('-')[0].trim();
+  return SERVICE_AREA_ZIP_CODES.some(
+    (code) => String(code).trim() === cleanZip || String(code).trim() === zip.trim()
+  );
+};
 
 // --- Constants ---
 const GALLERY_SAMPLES = [
@@ -286,8 +300,10 @@ const EstimateForm = () => {
 
       if (!formData.zip.trim()) {
         newErrors.zip = 'Zip code is required';
-      } else if (!/^\d{5}(-\d{4})?$/.test(formData.zip)) {
+      } else if (!/^\d{5}(-\d{4})?$/.test(formData.zip.trim())) {
         newErrors.zip = 'Please enter a valid zip code';
+      } else if (!isZipInServiceArea(formData.zip)) {
+        newErrors.zip = 'The zip code introduced is outside of the service area - we serve Charlotte NC +20 miles radius';
       }
     }
 
@@ -823,15 +839,15 @@ const Footer = () => (
           <ul className="space-y-4 text-slate-400">
             <li className="flex items-start gap-3">
               <MapPin className="w-5 h-5 text-slate-500 shrink-0" />
-              <span>123 Design District,<br />New York, NY 10001</span>
+              <span>814 Evans Manor Dr<br />Weddington, NC 28104</span>
             </li>
             <li className="flex items-center gap-3">
               <Phone className="w-5 h-5 text-slate-500 shrink-0" />
-              <span>(555) 123-4567</span>
+              <span>(704) 750-9110</span>
             </li>
             <li className="flex items-center gap-3">
               <Mail className="w-5 h-5 text-slate-500 shrink-0" />
-              <span>hello@queencitybacksplash.com</span>
+              <span>contact@vadconstructions.com</span>
             </li>
           </ul>
         </div>
