@@ -43,12 +43,13 @@ export function observeJourney(root: HTMLElement) {
     for (const [element, cleanup] of cleanups) {
       if (!root.contains(element)) { cleanup(); cleanups.delete(element); }
     }
-    root.querySelectorAll<HTMLElement>('[data-analytics-section], [data-analytics-step]').forEach(element => {
+    root.querySelectorAll<HTMLElement>('[data-analytics-section], [data-analytics-step], [data-analytics-inquiry]').forEach(element => {
       if (cleanups.has(element)) return;
       let timer: ReturnType<typeof setTimeout> | undefined;
       const section = element.dataset.analyticsSection;
+      const inquiry = element.dataset.analyticsInquiry === 'true';
       const step = Number(element.dataset.analyticsStep);
-      const key = section ? `section:${section}` : `step:${step}`;
+      const key = section ? `section:${section}` : inquiry ? 'inquiry' : `step:${step}`;
       let recorded = false;
       const visible = () => {
         if (document.visibilityState !== 'visible') return false;
@@ -69,7 +70,7 @@ export function observeJourney(root: HTMLElement) {
           if (section) viewed.add(key);
           trackEvent(section ? 'section_view' : 'estimate_step_view', section
             ? { section_name: section }
-            : stepParameters(step));
+            : inquiry ? { form_id: 'estimate', form_version: 'short_inquiry', step_number: 1, step_name: 'quick_inquiry' } : stepParameters(step));
         }, 1000);
       };
       const observer = new IntersectionObserver(check, {

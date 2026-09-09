@@ -92,3 +92,13 @@ test('effect cleanup cancels pending views', () => {
   const s = setup(); s.elements.push(s.element({ analyticsSection: 'process' }));
   s.api.observeJourney(s.root)(); s.flush(); assert.equal(s.events.length, 0);
 });
+
+test('short inquiry uses its own version and screen name', () => {
+  const s = setup();
+  s.elements.push(s.element({ analyticsInquiry: 'true' }));
+  s.api.observeJourney(s.root); s.flush();
+  assert.equal(s.events[0][1], 'estimate_step_view');
+  assert.equal(s.events[0][2].step_name, 'quick_inquiry');
+  assert.equal(s.events[0][2].form_version, 'short_inquiry');
+  assert.equal(s.events[0][2].step_number, 1);
+});

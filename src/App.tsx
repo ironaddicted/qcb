@@ -4,27 +4,25 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { observeJourney, stepParameters, trackEvent } from './analytics';
+import { observeJourney } from './analytics';
+import InquiryForm from './InquiryForm';
+import Hero from './Hero';
+import CompletedProjects from './CompletedProjects';
+import MobileContactBar from './MobileContactBar';
 import Reviews from './Reviews';
+import ServiceArea from './ServiceArea';
 import { motion, AnimatePresence } from 'motion/react';
 
-const StaggeredIcon = '/assets/staggered.svg';
-const StackedIcon = '/assets/stacked.svg';
-const HerringboneIcon = '/assets/herringbone.svg';
-const MosaicIcon = '/assets/mosaic.svg';
 
 import { 
   ChevronRight, 
   ChevronLeft, 
-  Check, 
   Phone, 
   Mail, 
   MapPin, 
   Instagram, 
   Facebook, 
   ArrowRight,
-  Ruler,
-  Archive,
   ShieldCheck,
   Award,
   Crown,
@@ -35,35 +33,7 @@ import {
   X
 } from 'lucide-react';
 
-// --- Types ---
-type TileType = 'ceramic' | 'glass' | 'solid';
-type TilePattern = 'staggered' | 'stacked' | 'herringbone' | 'mosaic';
-
-interface FormData {
-  source?: string;
-  areaType: 'sqft' | 'cabinets';
-  areaValue: string;
-  hasExisting: boolean;
-  needsDemolition: boolean;
-  zip: string;
-  tileType: TileType;
-  pattern?: TilePattern;
-  name: string;
-  phone: string;
-  email: string;
-}
-
-// --- Service Area Zip Codes (Charlotte NC +20 miles radius) ---
-// Leave the array empty for user to populate
-export const SERVICE_AREA_ZIP_CODES: (string | number)[] = [28202, 28203, 28204, 28205, 28206, 28207, 28208, 28209, 28210, 28211, 28212, 28213, 28214, 28215, 28216, 28217, 28226, 28227, 28262, 28269, 28270, 28273, 28277, 28104, 28105, 28134, 28031, 28036, 28078, 28110, 28111, 28112, 28173, 28103, 28174, 28025, 28026, 28027, 28081, 28083, 28075, 28144, 28146, 28023, 28115, 28117, 28625, 28677, 28092, 28093, 28037, 28052, 28054, 28056, 28012, 28120, 28150, 28152, 28001, 28097, 29730, 29732, 29707, 29708, 29715, 29745, 29710, 29720, 29706];
-
-export const isZipInServiceArea = (zip: string): boolean => {
-  if (!zip) return false;
-  const cleanZip = zip.trim().split('-')[0].trim();
-  return SERVICE_AREA_ZIP_CODES.some(
-    (code) => String(code).trim() === cleanZip || String(code).trim() === zip.trim()
-  );
-};
+export { SERVICE_AREA_ZIP_CODES, isZipInServiceArea } from './serviceAreaData';
 
 // --- Constants ---
 const GALLERY_SAMPLES = [
@@ -95,10 +65,11 @@ const Header = () => (
         </div>
       </div>
       
-      <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
+      <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-600">
         <a href="#gallery" className="hover:text-brand-teal transition-colors">Gallery</a>
-        <a href="#estimate" className="hover:text-brand-teal transition-colors">Free Estimate</a>
+        <a href="#estimate" className="hover:text-brand-teal transition-colors">Personal Quote</a>
         <a href="#process" className="hover:text-brand-teal transition-colors">Our Process</a>
+        <a href="#service-area" className="hover:text-brand-teal transition-colors">Service Area</a>
       </nav>
 
       <div className="flex items-center gap-4">
@@ -107,7 +78,7 @@ const Header = () => (
           (704) 750-9110
         </a>
         <a href="#estimate" className="bg-brand-teal text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-brand-teal/90 transition-all shadow-lg shadow-brand-teal/20">
-          Get Started
+          Get a Quote
         </a>
       </div>
     </div>
@@ -144,10 +115,11 @@ const Gallery = () => {
 
   return (
     <section id="gallery" className="py-24 bg-slate-50 overflow-hidden">
+      <CompletedProjects />
       <div className="max-w-7xl mx-auto px-4 mb-12 flex items-end justify-between">
         <div>
           <h2 className="text-4xl font-bold text-slate-900 mb-4">Inspiration Gallery</h2>
-          <p className="text-slate-600 max-w-2xl">Explore our recent installations featuring premium materials and expert craftsmanship. From classic subway to modern solid panels.</p>
+          <p className="text-slate-600 max-w-2xl">Explore tile styles and design inspiration, from classic subway to modern solid panels. We’ll help you choose the right look for your kitchen.</p>
         </div>
         <div className="flex gap-2">
           <button onClick={() => scroll('left')} className="p-3 rounded-full border border-slate-200 bg-white hover:bg-slate-50 transition-colors shadow-sm">
@@ -249,520 +221,6 @@ const Gallery = () => {
   );
 };
 
-const EstimateForm = () => {
-  const [step, setStep] = useState(0);
-  const [formData, setFormData] = useState<FormData>({
-    source: 'qcb',
-    areaType: 'sqft',
-    areaValue: '',
-    hasExisting: false,
-    needsDemolition: false,
-    zip : '',
-    tileType: 'ceramic',
-    name: '',
-    phone: '',
-    email: '',
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const hasStarted = useRef(false);
-  const trackFormStart = (event: React.SyntheticEvent) => {
-    if (!(event.target instanceof Element) || !event.target.closest('input, select, textarea, button')) return;
-    if (hasStarted.current) return;
-    hasStarted.current = true;
-    trackEvent('estimate_start', stepParameters(step));
-  };
-
-  const validateStep = (currentStep: number) => {
-    const newErrors: Record<string, string> = {};
-
-    if (currentStep === 0) {
-      if (!formData.areaValue) {
-        newErrors.areaValue = 'Area value is required';
-      } else {
-        const value = parseFloat(formData.areaValue);
-        if (isNaN(value) || value <= 0) {
-          newErrors.areaValue = 'Please enter a valid positive number';
-        }
-      }
-    }
-
-    if (currentStep === 4) {
-      if (!formData.name.trim()) {
-        newErrors.name = 'Full name is required';
-      }
-      
-      const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
-      if (!formData.phone.trim()) {
-        newErrors.phone = 'Phone number is required';
-      } else if (!phoneRegex.test(formData.phone)) {
-        newErrors.phone = 'Please enter a valid US phone number (e.g., 704-555-0123)';
-      }
-
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!formData.email.trim()) {
-        newErrors.email = 'Email address is required';
-      } else if (!emailRegex.test(formData.email)) {
-        newErrors.email = 'Please enter a valid email address';
-      }
-
-      if (!formData.zip.trim()) {
-        newErrors.zip = 'Zip code is required';
-      } else if (!/^\d{5}(-\d{4})?$/.test(formData.zip.trim())) {
-        newErrors.zip = 'Please enter a valid zip code';
-      } else if (!isZipInServiceArea(formData.zip)) {
-        newErrors.zip = 'The zip code introduced is outside of the service area - we serve Charlotte NC +20 miles radius';
-      }
-    }
-
-    setErrors(newErrors);
-    if (Object.keys(newErrors).length > 0) {
-      trackEvent('estimate_validation_error', stepParameters(currentStep));
-    }
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const nextStep = () => {
-    if (!validateStep(step)) return;
-    trackEvent('estimate_step_complete', stepParameters(step));
-
-    if (step === 2 && formData.tileType === 'solid') {
-      setStep(4);
-    } else {
-      setStep(prev => prev + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (step === 4 && formData.tileType === 'solid') {
-      setStep(2);
-    } else {
-      setStep(prev => prev - 1);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (isSubmitting || isSuccess) return;
-    if (!validateStep(4)) return;
-    setIsSubmitting(true);
-    trackEvent('estimate_submit_attempt', stepParameters(step));
-    try {
-      const response = await fetch('https://htmczrw2tgityftpxj5535hdye0zreqf.lambda-url.us-east-1.on.aws', {
-        method: 'POST',
-        mode: 'cors',
-        headers: {
-          'Content-Type': 'text/plain',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Submission failed with status ${response.status}`);
-      }
-
-      setIsSuccess(true);
-      trackEvent('generate_lead', { form_id: 'estimate' });
-      // Tracking failures must not turn an accepted request into a submission error.
-      try {
-        const analyticsWindow = window as Window & {
-          gtag?: (command: string, event: string, parameters: Record<string, unknown>) => void;
-        };
-        analyticsWindow.gtag?.('event', 'conversion', {
-          send_to: 'AW-16582460982/cr4VCNeZ2bMZELaMkeM9',
-          value: 1.0,
-          currency: 'USD',
-        });
-      } catch (error) {
-        console.error('Conversion tracking failed', error);
-      }
-    } catch (error) {
-      trackEvent('estimate_submit_error', stepParameters(step));
-      console.error('Submission failed', error);
-      alert('Failed to submit request. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const renderStep = () => {
-    switch (step) {
-      case 0:
-        return (
-          <div className="space-y-8">
-            <div className="text-center">
-              <h3 className="text-2xl font-bold mb-2">Project Dimensions</h3>
-              <p className="text-slate-500">How should we calculate your backsplash area?</p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <button 
-                onClick={() => setFormData({...formData, areaType: 'sqft'})}
-                className={`p-6 rounded-2xl border-2 text-left transition-all ${formData.areaType === 'sqft' ? 'border-brand-teal bg-brand-teal/5' : 'border-slate-100 hover:border-slate-200'}`}
-              >
-                <div className="w-10 h-10 rounded-full bg-brand-teal/10 flex items-center justify-center mb-4">
-                  <Ruler className="w-5 h-5 text-brand-teal" />
-                </div>
-                <h4 className="font-bold mb-1">By Square Footage</h4>
-                <p className="text-sm text-slate-500">I know the exact sqft of the area.</p>
-              </button>
-              <button 
-                onClick={() => setFormData({...formData, areaType: 'cabinets'})}
-                className={`p-6 rounded-2xl border-2 text-left transition-all ${formData.areaType === 'cabinets' ? 'border-brand-teal bg-brand-teal/5' : 'border-slate-100 hover:border-slate-200'}`}
-              >
-                <div className="w-10 h-10 rounded-full bg-brand-teal/10 flex items-center justify-center mb-4">
-                  <Archive className="w-5 h-5 text-brand-teal" />
-                </div>
-                <h4 className="font-bold mb-1">By Cabinet Count</h4>
-                <p className="text-sm text-slate-500">Number of bottom cabinets/appliances.</p>
-              </button>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700">
-                {formData.areaType === 'sqft' ? 'Total Square Feet' : 'Number of Bottom Cabinets (incl. range/dishwasher)'}
-              </label>
-              <input 
-                type="number"
-                value={formData.areaValue}
-                onChange={(e) => {
-                  setFormData({...formData, areaValue: e.target.value});
-                  if (errors.areaValue) setErrors({...errors, areaValue: ''});
-                }}
-                placeholder={formData.areaType === 'sqft' ? 'e.g. 35' : 'e.g. 6'}
-                className={`w-full px-4 py-3 rounded-xl border ${errors.areaValue ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-200 focus:ring-slate-900/20 focus:border-slate-900'} focus:outline-none focus:ring-2 transition-all`}
-              />
-              {errors.areaValue && <p className="text-red-500 text-xs mt-1 font-medium">{errors.areaValue}</p>}
-            </div>
-          </div>
-        );
-      case 1:
-        return (
-          <div className="space-y-8">
-            <div className="text-center">
-              <h3 className="text-2xl font-bold mb-2">Existing Backsplash</h3>
-              <p className="text-slate-500">Do we need to remove an old backsplash first?</p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <button 
-                onClick={() => setFormData({...formData, hasExisting: true, needsDemolition: true})}
-                className={`p-8 rounded-2xl border-2 transition-all ${formData.hasExisting ? 'border-brand-teal bg-brand-teal/5' : 'border-slate-100 hover:border-slate-200'}`}
-              >
-                <span className="text-lg font-bold">Yes</span>
-                <p className="text-sm text-slate-500 mt-1">Demolition needed</p>
-              </button>
-              <button 
-                onClick={() => setFormData({...formData, hasExisting: false, needsDemolition: false})}
-                className={`p-8 rounded-2xl border-2 transition-all ${!formData.hasExisting ? 'border-brand-teal bg-brand-teal/5' : 'border-slate-100 hover:border-slate-200'}`}
-              >
-                <span className="text-lg font-bold">No</span>
-                <p className="text-sm text-slate-500 mt-1">Fresh installation</p>
-              </button>
-            </div>
-          </div>
-        );
-      case 2:
-        return (
-          <div className="space-y-8">
-            <div className="text-center">
-              <h3 className="text-2xl font-bold mb-2">Tile Material</h3>
-              <p className="text-slate-500">What kind of material are you looking for?</p>
-            </div>
-            <div className="grid grid-cols-1 gap-4">
-              {[
-                { 
-                  id: 'ceramic', 
-                  label: 'Ceramic / Porcelain', 
-                  desc: 'Durable, classic, and versatile',
-                  image: '/assets/ceramic_2.png'
-                },
-                { 
-                  id: 'glass', 
-                  label: 'Glass', 
-                  desc: 'Modern, reflective, and easy to clean',
-                  image: '/assets/glass_selector.png'
-                },
-                { 
-                  id: 'solid', 
-                  label: 'Solid Panel', 
-                  desc: 'Seamless quartz or stone look',
-                  image: '/assets/solid_panel.png'
-                }
-              ].map((item) => (
-                <button 
-                  key={item.id}
-                  onClick={() => setFormData({...formData, tileType: item.id as TileType})}
-                  className={`group relative h-32 rounded-2xl border-2 overflow-hidden text-left transition-all ${
-                    formData.tileType === item.id ? 'border-brand-teal ring-4 ring-brand-teal/10' : 'border-slate-100 hover:border-slate-300'
-                  }`}
-                >
-                  {/* Background Image */}
-                  <div className="absolute inset-0 z-0">
-                    <img 
-                      src={item.image} 
-                      alt={item.label}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className={`absolute inset-0 transition-colors duration-300 ${
-                      formData.tileType === item.id ? 'bg-brand-teal/60' : 'bg-black/40 group-hover:bg-black/30'
-                    }`} />
-                  </div>
-
-                  {/* Content */}
-                  <div className="relative z-10 p-6 flex items-center justify-between h-full">
-                    <div>
-                      <h4 className="font-bold text-white text-xl mb-1 drop-shadow-md">{item.label}</h4>
-                      <p className="text-sm text-slate-100 drop-shadow-sm">{item.desc}</p>
-                    </div>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all ${
-                      formData.tileType === item.id ? 'bg-white scale-110' : 'bg-white/20 backdrop-blur-sm'
-                    }`}>
-                      {formData.tileType === item.id ? (
-                        <Check className="w-5 h-5 text-brand-teal" />
-                      ) : (
-                        <div className="w-2 h-2 rounded-full bg-white" />
-                      )}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        );
-      case 3:
-        return (
-          <div className="space-y-8">
-            <div className="text-center">
-              <h3 className="text-2xl font-bold mb-2">Tile Pattern</h3>
-              <p className="text-slate-500">Choose the layout for your {formData.tileType} tiles.</p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { id: 'staggered', label: 'Staggered', icon: <img src={StaggeredIcon} className="w-8 h-8 opacity-70" alt="" />, desc: '50% offset' },
-                { id: 'stacked', label: 'Stacked', icon: <img src={StackedIcon} className="w-8 h-8 opacity-70" alt="" />, desc: 'Aligned grid' },
-                { id: 'herringbone', label: 'Herringbone', icon: <img src={HerringboneIcon} className="w-8 h-8 opacity-70" alt="" />, desc: 'V-shape pattern' },
-                { id: 'mosaic', label: 'Mosaic', icon: <img src={MosaicIcon} className="w-8 h-8 opacity-70" alt="" />, desc: 'Hex or small pattern' }
-              ].map((item) => (
-                <button 
-                  key={item.id}
-                  onClick={() => setFormData({...formData, pattern: item.id as TilePattern})}
-                  className={`p-6 rounded-2xl border-2 text-center transition-all ${formData.pattern === item.id ? 'border-brand-teal bg-brand-teal/5' : 'border-slate-100 hover:border-slate-200'}`}
-                >
-                  <div className="w-12 h-12 mx-auto bg-slate-100 rounded-xl flex items-center justify-center mb-3 group-hover:bg-white transition-colors">
-                    {item.icon}
-                  </div>
-                  <h4 className="font-bold text-sm">{item.label}</h4>
-                  <p className="text-xs text-slate-500 mt-1">{item.desc}</p>
-                </button>
-              ))}
-            </div>
-          </div>
-        );
-      case 4:
-        return (
-          <div className="space-y-8">
-            <div className="text-center">
-              <h3 className="text-2xl font-bold mb-2">Contact Details</h3>
-              <p className="text-slate-500">Where should we send your estimate?</p>
-            </div>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Full Name</label>
-                <input 
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => {
-                    setFormData({...formData, name: e.target.value});
-                    if (errors.name) setErrors({...errors, name: ''});
-                  }}
-                  className={`w-full px-4 py-3 rounded-xl border ${errors.name ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-200 focus:ring-slate-900/20 focus:border-slate-900'} focus:outline-none focus:ring-2 transition-all`}
-                />
-                {errors.name && <p className="text-red-500 text-xs mt-1 font-medium">{errors.name}</p>}
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Phone Number</label>
-                <input 
-                  type="tel"
-                  required
-                  value={formData.phone}
-                  onChange={(e) => {
-                    setFormData({...formData, phone: e.target.value});
-                    if (errors.phone) setErrors({...errors, phone: ''});
-                  }}
-                  className={`w-full px-4 py-3 rounded-xl border ${errors.phone ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-200 focus:ring-slate-900/20 focus:border-slate-900'} focus:outline-none focus:ring-2 transition-all`}
-                />
-                {errors.phone && <p className="text-red-500 text-xs mt-1 font-medium">{errors.phone}</p>}
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Zip Code</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.zip}
-                  onChange={(e) => {
-                    setFormData({...formData, zip: e.target.value});
-                    if (errors.zip) setErrors({...errors, zip: ''});
-                  }}
-                  className={`w-full px-4 py-3 rounded-xl border ${errors.zip ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-200 focus:ring-slate-900/20 focus:border-slate-900'} focus:outline-none focus:ring-2 transition-all`}
-                />
-                {errors.zip && <p className="text-red-500 text-xs mt-1 font-medium">{errors.zip}</p>}
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Email Address</label>
-                <input 
-                  type="email"
-                  required
-                  value={formData.email}
-                  onChange={(e) => {
-                    setFormData({...formData, email: e.target.value});
-                    if (errors.email) setErrors({...errors, email: ''});
-                  }}
-                  className={`w-full px-4 py-3 rounded-xl border ${errors.email ? 'border-red-500 focus:ring-red-500/20 focus:border-red-500' : 'border-slate-200 focus:ring-slate-900/20 focus:border-slate-900'} focus:outline-none focus:ring-2 transition-all`}
-                />
-                {errors.email && <p className="text-red-500 text-xs mt-1 font-medium">{errors.email}</p>}
-              </div>
-            </div>
-          </div>
-        );
-      case 5:
-        return (
-          <div className="space-y-6 text-center py-4">
-            <div className="w-16 h-16 bg-brand-teal/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Check className="w-8 h-8 text-brand-teal" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-2xl font-bold">Ready to Submit?</h3>
-              <p className="text-slate-500 text-sm max-w-sm mx-auto">
-                Review your selections below before sending your request.
-              </p>
-            </div>
-
-            {/* Project Summary Card */}
-            <div className="bg-slate-50 rounded-2xl p-6 text-left border border-slate-100 space-y-4">
-              <div className="grid grid-cols-2 gap-y-4 gap-x-6 text-sm">
-                <div>
-                  <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-0.5">Dimensions</p>
-                  <p className="font-semibold text-slate-900">{formData.areaValue} {formData.areaType === 'sqft' ? 'sqft' : 'cabinets'}</p>
-                </div>
-                <div>
-                  <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-0.5">Demolition</p>
-                  <p className="font-semibold text-slate-900">{formData.hasExisting ? 'Required' : 'Not Needed'}</p>
-                </div>
-                <div>
-                  <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-0.5">Material</p>
-                  <p className="font-semibold text-slate-900 capitalize">{formData.tileType}</p>
-                </div>
-                {formData.tileType !== 'solid' && (
-                  <div>
-                    <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-0.5">Pattern</p>
-                    <p className="font-semibold text-slate-900 capitalize">{formData.pattern || 'Standard'}</p>
-                  </div>
-                )}
-                <div className="col-span-2 pt-3 border-t border-slate-200">
-                  <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-0.5">Contact Information</p>
-                  <p className="font-semibold text-slate-900">{formData.name} • {formData.phone}</p>
-                  <p className="text-slate-500 text-xs">{formData.email}</p>
-                  {formData.zip && <p className="text-slate-500 text-xs mt-1">Zip Code: {formData.zip}</p>}
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <button 
-                onClick={handleSubmit}
-                disabled={isSubmitting}
-                className="w-full bg-brand-teal text-white py-4 rounded-2xl font-bold text-lg hover:bg-brand-teal/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2 shadow-xl shadow-brand-teal/20"
-              >
-                {isSubmitting ? 'Processing...' : 'Submit Estimate Request'}
-                {!isSubmitting && <ArrowRight className="w-5 h-5" />}
-              </button>
-            </div>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
-
-  if (isSuccess) {
-    return (
-      <section id="estimate" className="py-24 bg-white">
-        <div className="max-w-3xl mx-auto px-4">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-slate-50 rounded-3xl p-12 text-center border border-slate-100"
-          >
-            <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-8">
-              <Check className="text-white w-10 h-10" />
-            </div>
-            <h2 className="text-4xl font-bold mb-4">Request Received!</h2>
-            <p className="text-slate-600 text-lg mb-8">
-              Thank you, {formData.name}. We've received your request and our specialists are already working on your estimate.
-            </p>
-            <p className="text-slate-400 text-sm italic">
-              Our team will contact you shortly at {formData.phone} or {formData.email}.
-            </p>
-          </motion.div>
-        </div>
-      </section>
-    );
-  }
-
-  return (
-    <section id="estimate" className="py-24 bg-white min-h-[800px] flex items-center">
-      <div className="max-w-3xl mx-auto px-4 w-full">
-        <div className="mb-12">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Step {step + 1} of 6</span>
-            <div className="flex gap-1">
-              {[0, 1, 2, 3, 4, 5].map((i) => (
-                <div key={i} className={`h-1.5 w-8 rounded-full transition-colors ${i <= step ? 'bg-slate-900' : 'bg-slate-100'}`} />
-              ))}
-            </div>
-          </div>
-          <h2 className="text-4xl font-bold text-slate-900">Free Estimate</h2>
-        </div>
-
-        <div className="relative overflow-hidden min-h-[450px]" onChangeCapture={trackFormStart} onClickCapture={trackFormStart}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={step}
-              data-analytics-step={step}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.3 }}
-            >
-              {renderStep()}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {step < 5 && (
-          <div className="mt-12 flex items-center justify-between gap-4">
-            <button 
-              onClick={prevStep}
-              disabled={step === 0}
-              className="px-8 py-4 rounded-2xl font-bold text-slate-600 hover:bg-slate-50 transition-colors disabled:opacity-0"
-            >
-              Back
-            </button>
-            <button 
-              onClick={nextStep}
-              disabled={step === 0 && !formData.areaValue}
-              className="bg-slate-900 text-white px-10 py-4 rounded-2xl font-bold hover:bg-slate-800 transition-all shadow-xl shadow-slate-200 flex items-center gap-2 disabled:opacity-50"
-            >
-              Continue
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-        )}
-      </div>
-    </section>
-  );
-};
-
 const Process = () => {
   const steps = [
     {
@@ -828,10 +286,10 @@ const Process = () => {
         <div className="mt-20 bg-white rounded-3xl p-8 md:p-12 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex-1">
             <h3 className="text-2xl font-bold mb-2">Ready to transform your kitchen?</h3>
-            <p className="text-slate-500">Get a professional estimate for your project today.</p>
+            <p className="text-slate-500">Talk with Alex about your kitchen and request a personal installation quote.</p>
           </div>
           <a href="#estimate" className="bg-brand-teal text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-teal/90 transition-all flex items-center gap-2 shrink-0">
-            Get My Free Estimate
+            Request My Personal Quote
             <ArrowRight className="w-5 h-5" />
           </a>
         </div>
@@ -880,11 +338,11 @@ const Footer = () => (
             </li>
             <li className="flex items-center gap-3">
               <Phone className="w-5 h-5 text-slate-500 shrink-0" />
-              <span>(704) 750-9110</span>
+              <a href="tel:+17047509110" className="hover:text-white underline underline-offset-4">(704) 750-9110</a>
             </li>
             <li className="flex items-center gap-3">
               <Mail className="w-5 h-5 text-slate-500 shrink-0" />
-              <span>contact@vadconstructions.com</span>
+              <a href="mailto:contact@vadconstructions.com" className="hover:text-white">contact@vadconstructions.com</a>
             </li>
           </ul>
         </div>
@@ -893,8 +351,9 @@ const Footer = () => (
           <h4 className="font-bold mb-6">Quick Links</h4>
           <ul className="space-y-4 text-slate-400">
             <li><a href="#gallery" className="hover:text-white transition-colors">Gallery</a></li>
-            <li><a href="#estimate" className="hover:text-white transition-colors">Free Estimate</a></li>
+            <li><a href="#estimate" className="hover:text-white transition-colors">Personal Quote</a></li>
             <li><a href="#process" className="hover:text-white transition-colors">Our Process</a></li>
+            <li><a href="#service-area" className="hover:text-white transition-colors">Service Area</a></li>
             <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
           </ul>
         </div>
@@ -920,6 +379,7 @@ export default function App() {
       ['main > section:first-child', 'introduction'],
       ['#gallery', 'inspiration_gallery'],
       ['#process', 'process'],
+      ['#service-area', 'service_area'],
       ['#estimate', 'estimate_form'],
       ['footer', 'general_information'],
     ];
@@ -929,71 +389,20 @@ export default function App() {
     return observeJourney(root);
   }, []);
   return (
-    <div ref={journeyRef} className="min-h-screen">
+    <div ref={journeyRef} className="min-h-screen pb-[calc(84px+env(safe-area-inset-bottom))] sm:pb-0">
       <Header />
       
       <main>
-        {/* Hero Section */}
-        <section className="pt-40 pb-24 bg-white relative overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4 relative z-10">
-            <motion.div 
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="max-w-3xl"
-            >
-              <div className="flex flex-wrap gap-3 mb-6">
-                <span className="inline-block px-4 py-1.5 rounded-full bg-slate-100 text-slate-900 text-xs font-bold uppercase tracking-widest">
-                  Expert Installation
-                </span>
-                <span className="inline-block px-4 py-1.5 rounded-full bg-brand-teal text-white text-xs font-bold uppercase tracking-widest">
-                  Fully Insured
-                </span>
-                <span className="inline-block px-4 py-1.5 rounded-full bg-slate-100 text-slate-900 text-xs font-bold uppercase tracking-widest">
-                  5+ Years Experience
-                </span>
-              </div>
-              <h1 className="text-6xl md:text-8xl font-bold text-slate-900 leading-[0.9] mb-8 tracking-tighter">
-                Queen City's Premier <span className="text-brand-teal italic">Backsplash</span> Experts.
-              </h1>
-              <p className="text-sm font-semibold text-brand-teal mb-5">
-                A backsplash division of{' '}
-                <a href="https://vadconstructions.com/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">VAD Constructions</a>
-              </p>
-              <p className="text-xl text-slate-600 mb-10 max-w-xl leading-relaxed">
-                Professional backsplash installation for subway, herringbone, glass, and solid panels. Get a free estimate in minutes.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <a href="#estimate" className="bg-brand-teal text-white px-10 py-5 rounded-2xl font-bold text-lg hover:bg-brand-teal/90 transition-all shadow-2xl shadow-brand-teal/20 flex items-center gap-2">
-                  Start Estimate
-                  <ArrowRight className="w-5 h-5" />
-                </a>
-                <a href="#gallery" className="px-10 py-5 rounded-2xl font-bold text-lg border border-slate-200 hover:bg-slate-50 transition-all">
-                  View Gallery
-                </a>
-              </div>
-            </motion.div>
-          </div>
-          
-          {/* Background Decoration */}
-          <div className="absolute top-0 right-0 w-1/2 h-full hidden lg:block">
-            <div className="w-full h-full bg-slate-50 rounded-bl-[200px] overflow-hidden">
-              <img 
-                src="https://storage.googleapis.com/applet-assets/input_file_2.png" 
-                alt="Modern Kitchen Tile" 
-                className="w-full h-full object-cover opacity-90"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-          </div>
-        </section>
-
+        <Hero />
+        <Reviews />
+        <InquiryForm />
         <Gallery />
         <Process />
-        <Reviews />
-        <EstimateForm />
+        <ServiceArea />
       </main>
 
       <Footer />
+      <MobileContactBar />
     </div>
   );
 }

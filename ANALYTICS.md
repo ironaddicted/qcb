@@ -1,5 +1,36 @@
 # Visitor journey tracking
 
+## Current inquiry flow (September 9, 2026)
+
+The six-screen wizard has been replaced by a single contact form. Current
+`estimate_step_view` events use `step_name=quick_inquiry`, `step_number=1`, and
+`form_version=short_inquiry`. Register `form_version` as an event-scoped GA4
+custom dimension to distinguish the new funnel from historical wizard data.
+The current funnel is section_view (estimate_form) → estimate_step_view
+(quick_inquiry) → estimate_start → estimate_submit_attempt → generate_lead.
+Start fires on the first field change, rather than merely seeing the form.
+Contact-click events carry `method=call|sms` and `placement`; these are not leads.
+Measurements, demolition, materials, and pattern are collected in the follow-up
+conversation rather than blocking the initial request. Photos are optional
+and sent through the visitor's messaging app; no file upload is advertised.
+
+The submission POST now contains only source, name, phone, ZIP, and optional
+email. The Lambda implementation is outside this repository: verify that its
+validation and notification template accept missing project fields and blank
+email before deploying. Local tests mock responses and do not send test leads.
+HTTP success alone triggers confirmation and the Google Ads conversion.
+
+The wizard-specific events, steps, and reporting examples below document the
+previous form for historical reporting; they are no longer the active flow.
+
+## Content sources
+
+- Completed Kannapolis backsplash photo and scope: https://vadconstructions.com/
+  (assets/img/portfolio/6.jpg). No project price is claimed.
+- Hero review excerpt: Julie H., April 2026, kitchen backsplash for VAD
+  Constructions on Thumbtack. See PROJECT-PHOTOS.md for photo and review sources.
+- Response target supplied by the owner: aim for 2–3 hours during business hours.
+
 ## Enable reporting
 
 The existing AW-16582460982 tag is a Google Ads destination. Journey events

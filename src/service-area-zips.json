@@ -1,0 +1,485 @@
+[
+  {
+    "zip": "28025",
+    "city": "Concord",
+    "state": "NC",
+    "lat": 35.3716,
+    "lng": -80.53
+  },
+  {
+    "zip": "28026",
+    "city": "Concord",
+    "state": "NC",
+    "lat": 35.3463,
+    "lng": -80.5411
+  },
+  {
+    "zip": "28027",
+    "city": "Concord",
+    "state": "NC",
+    "lat": 35.4141,
+    "lng": -80.6162
+  },
+  {
+    "zip": "28075",
+    "city": "Harrisburg",
+    "state": "NC",
+    "lat": 35.3247,
+    "lng": -80.6594
+  },
+  {
+    "zip": "28081",
+    "city": "Kannapolis",
+    "state": "NC",
+    "lat": 35.502,
+    "lng": -80.6359
+  },
+  {
+    "zip": "28083",
+    "city": "Kannapolis",
+    "state": "NC",
+    "lat": 35.4848,
+    "lng": -80.6015
+  },
+  {
+    "zip": "28150",
+    "city": "Shelby",
+    "state": "NC",
+    "lat": 35.312,
+    "lng": -81.5568
+  },
+  {
+    "zip": "28152",
+    "city": "Shelby",
+    "state": "NC",
+    "lat": 35.2689,
+    "lng": -81.5337
+  },
+  {
+    "zip": "28012",
+    "city": "Belmont",
+    "state": "NC",
+    "lat": 35.244,
+    "lng": -81.044
+  },
+  {
+    "zip": "28052",
+    "city": "Gastonia",
+    "state": "NC",
+    "lat": 35.2449,
+    "lng": -81.2194
+  },
+  {
+    "zip": "28054",
+    "city": "Gastonia",
+    "state": "NC",
+    "lat": 35.2495,
+    "lng": -81.133
+  },
+  {
+    "zip": "28056",
+    "city": "Gastonia",
+    "state": "NC",
+    "lat": 35.2172,
+    "lng": -81.1252
+  },
+  {
+    "zip": "28120",
+    "city": "Mount Holly",
+    "state": "NC",
+    "lat": 35.3119,
+    "lng": -81.0306
+  },
+  {
+    "zip": "28115",
+    "city": "Mooresville",
+    "state": "NC",
+    "lat": 35.5774,
+    "lng": -80.8226
+  },
+  {
+    "zip": "28117",
+    "city": "Mooresville",
+    "state": "NC",
+    "lat": 35.584,
+    "lng": -80.8685
+  },
+  {
+    "zip": "28625",
+    "city": "Statesville",
+    "state": "NC",
+    "lat": 35.8651,
+    "lng": -80.8858
+  },
+  {
+    "zip": "28677",
+    "city": "Statesville",
+    "state": "NC",
+    "lat": 35.799,
+    "lng": -80.894
+  },
+  {
+    "zip": "28037",
+    "city": "Denver",
+    "state": "NC",
+    "lat": 35.4837,
+    "lng": -80.9898
+  },
+  {
+    "zip": "28092",
+    "city": "Lincolnton",
+    "state": "NC",
+    "lat": 35.4851,
+    "lng": -81.1818
+  },
+  {
+    "zip": "28093",
+    "city": "Lincolnton",
+    "state": "NC",
+    "lat": 35.4848,
+    "lng": -81.2395
+  },
+  {
+    "zip": "28031",
+    "city": "Cornelius",
+    "state": "NC",
+    "lat": 35.4733,
+    "lng": -80.8726
+  },
+  {
+    "zip": "28036",
+    "city": "Davidson",
+    "state": "NC",
+    "lat": 35.4858,
+    "lng": -80.794
+  },
+  {
+    "zip": "28078",
+    "city": "Huntersville",
+    "state": "NC",
+    "lat": 35.4011,
+    "lng": -80.8695
+  },
+  {
+    "zip": "28104",
+    "city": "Matthews",
+    "state": "NC",
+    "lat": 35.0604,
+    "lng": -80.6958
+  },
+  {
+    "zip": "28105",
+    "city": "Matthews",
+    "state": "NC",
+    "lat": 35.1149,
+    "lng": -80.705
+  },
+  {
+    "zip": "28134",
+    "city": "Pineville",
+    "state": "NC",
+    "lat": 35.0709,
+    "lng": -80.8859
+  },
+  {
+    "zip": "28202",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.229,
+    "lng": -80.8419
+  },
+  {
+    "zip": "28203",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.2081,
+    "lng": -80.8583
+  },
+  {
+    "zip": "28204",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.2132,
+    "lng": -80.8231
+  },
+  {
+    "zip": "28205",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.22,
+    "lng": -80.7881
+  },
+  {
+    "zip": "28206",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.2522,
+    "lng": -80.8265
+  },
+  {
+    "zip": "28207",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.1935,
+    "lng": -80.8272
+  },
+  {
+    "zip": "28208",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.2358,
+    "lng": -80.8964
+  },
+  {
+    "zip": "28209",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.1796,
+    "lng": -80.8559
+  },
+  {
+    "zip": "28210",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.1316,
+    "lng": -80.8577
+  },
+  {
+    "zip": "28211",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.1677,
+    "lng": -80.7932
+  },
+  {
+    "zip": "28212",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.1908,
+    "lng": -80.7448
+  },
+  {
+    "zip": "28213",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.2836,
+    "lng": -80.7638
+  },
+  {
+    "zip": "28214",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.2731,
+    "lng": -80.9571
+  },
+  {
+    "zip": "28215",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.244,
+    "lng": -80.7387
+  },
+  {
+    "zip": "28216",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.2834,
+    "lng": -80.8702
+  },
+  {
+    "zip": "28217",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.1714,
+    "lng": -80.9084
+  },
+  {
+    "zip": "28226",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.0869,
+    "lng": -80.8167
+  },
+  {
+    "zip": "28227",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.1936,
+    "lng": -80.6846
+  },
+  {
+    "zip": "28262",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.3183,
+    "lng": -80.7476
+  },
+  {
+    "zip": "28269",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.2886,
+    "lng": -80.8209
+  },
+  {
+    "zip": "28270",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.1355,
+    "lng": -80.7669
+  },
+  {
+    "zip": "28273",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.1287,
+    "lng": -80.9338
+  },
+  {
+    "zip": "28277",
+    "city": "Charlotte",
+    "state": "NC",
+    "lat": 35.0552,
+    "lng": -80.8195
+  },
+  {
+    "zip": "28023",
+    "city": "China Grove",
+    "state": "NC",
+    "lat": 35.5669,
+    "lng": -80.59
+  },
+  {
+    "zip": "28144",
+    "city": "Salisbury",
+    "state": "NC",
+    "lat": 35.6515,
+    "lng": -80.4889
+  },
+  {
+    "zip": "28146",
+    "city": "Salisbury",
+    "state": "NC",
+    "lat": 35.6187,
+    "lng": -80.4022
+  },
+  {
+    "zip": "28001",
+    "city": "Albemarle",
+    "state": "NC",
+    "lat": 35.3573,
+    "lng": -80.2044
+  },
+  {
+    "zip": "28097",
+    "city": "Locust",
+    "state": "NC",
+    "lat": 35.2704,
+    "lng": -80.4211
+  },
+  {
+    "zip": "28103",
+    "city": "Marshville",
+    "state": "NC",
+    "lat": 35.0167,
+    "lng": -80.3781
+  },
+  {
+    "zip": "28110",
+    "city": "Monroe",
+    "state": "NC",
+    "lat": 35.0178,
+    "lng": -80.5372
+  },
+  {
+    "zip": "28111",
+    "city": "Monroe",
+    "state": "NC",
+    "lat": 35.0112,
+    "lng": -80.5587
+  },
+  {
+    "zip": "28112",
+    "city": "Monroe",
+    "state": "NC",
+    "lat": 34.8946,
+    "lng": -80.554
+  },
+  {
+    "zip": "28173",
+    "city": "Waxhaw",
+    "state": "NC",
+    "lat": 34.9251,
+    "lng": -80.7278
+  },
+  {
+    "zip": "28174",
+    "city": "Wingate",
+    "state": "NC",
+    "lat": 34.9847,
+    "lng": -80.4476
+  },
+  {
+    "zip": "29706",
+    "city": "Chester",
+    "state": "SC",
+    "lat": 34.7149,
+    "lng": -81.2186
+  },
+  {
+    "zip": "29707",
+    "city": "Fort Mill",
+    "state": "SC",
+    "lat": 34.9773,
+    "lng": -80.8584
+  },
+  {
+    "zip": "29720",
+    "city": "Lancaster",
+    "state": "SC",
+    "lat": 34.749,
+    "lng": -80.7616
+  },
+  {
+    "zip": "29708",
+    "city": "Fort Mill",
+    "state": "SC",
+    "lat": 35.0502,
+    "lng": -80.9908
+  },
+  {
+    "zip": "29710",
+    "city": "Clover",
+    "state": "SC",
+    "lat": 35.1065,
+    "lng": -81.2201
+  },
+  {
+    "zip": "29715",
+    "city": "Fort Mill",
+    "state": "SC",
+    "lat": 35.0108,
+    "lng": -80.9266
+  },
+  {
+    "zip": "29730",
+    "city": "Rock Hill",
+    "state": "SC",
+    "lat": 34.9151,
+    "lng": -81.0129
+  },
+  {
+    "zip": "29732",
+    "city": "Rock Hill",
+    "state": "SC",
+    "lat": 34.9681,
+    "lng": -81.0489
+  },
+  {
+    "zip": "29745",
+    "city": "York",
+    "state": "SC",
+    "lat": 34.9947,
+    "lng": -81.2245
+  }
+]
