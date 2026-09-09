@@ -15,7 +15,7 @@ export function validateInquiry(data: Inquiry, covered: (zip: string) => boolean
     errors.phone = 'Please enter a valid US phone number.';
   }
   if (!/^\d{5}(-\d{4})?$/.test(data.zip.trim())) errors.zip = 'Please enter a valid ZIP code.';
-  else if (!covered(data.zip.trim())) errors.zip = 'This ZIP is outside our listed service area. Call Alex to discuss your location.';
+  else if (!covered(data.zip.trim())) errors.zip = 'This ZIP is outside our listed service area. Call us to discuss your location.';
   if (data.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) errors.email = 'Please enter a valid email or leave it blank.';
   return errors;
 }

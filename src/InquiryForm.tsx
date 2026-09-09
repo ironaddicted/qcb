@@ -36,7 +36,7 @@ export default function InquiryForm() {
     } catch {
       locked.current = false;
       setPending(false);
-      setSubmissionError('We couldn’t confirm your request. Please try again, or call/text Alex directly.');
+      setSubmissionError('We couldn’t confirm your request. Please try again, or call/text us directly.');
       trackEvent('estimate_submit_error', eventDetails);
       return;
     }
@@ -56,20 +56,20 @@ export default function InquiryForm() {
         <div>
           <p className="text-brand-teal text-xs font-bold uppercase tracking-widest mb-4">Let’s talk about your kitchen</p>
           <h2 id="inquiry-heading" className="text-3xl md:text-4xl font-bold mb-5">Your personal backsplash quote starts here.</h2>
-          <p className="text-slate-600 leading-relaxed mb-4">Just your contact details. Alex will discuss your kitchen, help with measurements, and prepare a personal quote.</p>
+          <p className="text-slate-600 leading-relaxed mb-4">Just your contact details. Our team will discuss your kitchen, help with measurements, and prepare a personal quote.</p>
           <p className="font-semibold text-brand-teal mb-6">{RESPONSE_TIME}</p>
           <p className="text-sm text-slate-500 mb-6">No measurements or material decisions needed. This is a free quote request; your project price follows a conversation about the work.</p>
-          <a href={CALL_URL} className="inline-flex items-center gap-2 font-semibold text-brand-teal underline underline-offset-4"><Phone className="w-4 h-4" /> Prefer to talk? Call Alex</a>
+          <a href={CALL_URL} className="inline-flex items-center gap-2 font-semibold text-brand-teal underline underline-offset-4"><Phone className="w-4 h-4" /> Prefer to talk? Call Us</a>
         </div>
         <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm">
           {success ? (
             <div role="status" className="space-y-5">
               <CheckCircle className="h-12 w-12 text-brand-teal" />
               <h3 className="text-2xl font-bold">Thanks, {data.name.trim()} — your request is in.</h3>
-              <p className="text-slate-600">Alex will contact you at {data.phone}. {RESPONSE_TIME}</p>
+              <p className="text-slate-600">We’ll contact you at {data.phone}. {RESPONSE_TIME}</p>
               <p className="text-slate-600">Next, we’ll talk through your backsplash, measurements, material options, and installation needs.</p>
               <a href={TEXT_URL} onClick={() => trackEvent('contact_click', { method: 'sms', placement: 'confirmation' })} className="inline-flex gap-2 items-center font-semibold text-brand-teal underline underline-offset-4"><MessageSquare className="w-5 h-5" /> Text Kitchen Photos (optional)</a>
-              <p className="text-sm text-slate-500">Attach your photos in your messaging app and include your name so Alex can match them to your request.</p>
+              <p className="text-sm text-slate-500">Attach your photos in your messaging app and include your name so we can match them to your request.</p>
             </div>
           ) : (
             <form onSubmit={submit} noValidate data-analytics-inquiry="true" onChange={() => {
@@ -99,7 +99,7 @@ export default function InquiryForm() {
               </div>
               {submissionError && <p role="alert" className="text-red-700 mt-5">{submissionError}</p>}
               <button type="submit" disabled={pending} className="mt-6 w-full rounded-xl bg-brand-teal px-5 py-4 text-white font-bold flex justify-center items-center gap-2 disabled:opacity-60 hover:bg-brand-teal/90">{pending ? 'Sending your request…' : 'Request My Personal Quote'}<ArrowRight className="w-5 h-5" /></button>
-              <p className="text-xs leading-relaxed text-slate-500 mt-4">By sending this request, you’re asking Alex at VAD Constructions to contact you about your project.</p>
+              <p className="text-xs leading-relaxed text-slate-500 mt-4">By sending this request, you’re asking our team at VAD Constructions to contact you about your project.</p>
             </form>
           )}
         </div>

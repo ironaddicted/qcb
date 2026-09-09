@@ -286,7 +286,7 @@ const Process = () => {
         <div className="mt-20 bg-white rounded-3xl p-8 md:p-12 border border-slate-100 shadow-xl shadow-slate-200/50 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex-1">
             <h3 className="text-2xl font-bold mb-2">Ready to transform your kitchen?</h3>
-            <p className="text-slate-500">Talk with Alex about your kitchen and request a personal installation quote.</p>
+            <p className="text-slate-500">Talk with us about your kitchen and request a personal installation quote.</p>
           </div>
           <a href="#estimate" className="bg-brand-teal text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-teal/90 transition-all flex items-center gap-2 shrink-0">
             Request My Personal Quote
