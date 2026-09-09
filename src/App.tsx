@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useRef} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { observeJourney, stepParameters, trackEvent } from './analytics';
 import { motion, AnimatePresence } from 'motion/react';
 
 const StaggeredIcon = '/assets/staggered.svg';
@@ -264,6 +265,13 @@ const EstimateForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const hasStarted = useRef(false);
+  const trackFormStart = (event: React.SyntheticEvent) => {
+    if (!(event.target instanceof Element) || !event.target.closest('input, select, textarea, button')) return;
+    if (hasStarted.current) return;
+    hasStarted.current = true;
+    trackEvent('estimate_start', stepParameters(step));
+  };
 
   const validateStep = (currentStep: number) => {
     const newErrors: Record<string, string> = {};
@@ -308,11 +316,15 @@ const EstimateForm = () => {
     }
 
     setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) {
+      trackEvent('estimate_validation_error', stepParameters(currentStep));
+    }
     return Object.keys(newErrors).length === 0;
   };
 
   const nextStep = () => {
     if (!validateStep(step)) return;
+    trackEvent('estimate_step_complete', stepParameters(step));
 
     if (step === 2 && formData.tileType === 'solid') {
       setStep(4);
@@ -330,22 +342,41 @@ const EstimateForm = () => {
   };
 
   const handleSubmit = async () => {
+    if (isSubmitting || isSuccess) return;
     if (!validateStep(4)) return;
     setIsSubmitting(true);
+    trackEvent('estimate_submit_attempt', stepParameters(step));
     try {
       const response = await fetch('https://htmczrw2tgityftpxj5535hdye0zreqf.lambda-url.us-east-1.on.aws', {
         method: 'POST',
-        mode: 'no-cors',
+        mode: 'cors',
         headers: {
           'Content-Type': 'text/plain',
         },
         body: JSON.stringify(formData),
       });
 
-      // With no-cors, we can't check response.ok or response.status.
-      // It will be an "opaque" response.
+      if (!response.ok) {
+        throw new Error(`Submission failed with status ${response.status}`);
+      }
+
       setIsSuccess(true);
+      trackEvent('generate_lead', { form_id: 'estimate' });
+      // Tracking failures must not turn an accepted request into a submission error.
+      try {
+        const analyticsWindow = window as Window & {
+          gtag?: (command: string, event: string, parameters: Record<string, unknown>) => void;
+        };
+        analyticsWindow.gtag?.('event', 'conversion', {
+          send_to: 'AW-16582460982/cr4VCNeZ2bMZELaMkeM9',
+          value: 1.0,
+          currency: 'USD',
+        });
+      } catch (error) {
+        console.error('Conversion tracking failed', error);
+      }
     } catch (error) {
+      trackEvent('estimate_submit_error', stepParameters(step));
       console.error('Submission failed', error);
       alert('Failed to submit request. Please try again.');
     } finally {
@@ -692,10 +723,11 @@ const EstimateForm = () => {
           <h2 className="text-4xl font-bold text-slate-900">Free Estimate</h2>
         </div>
 
-        <div className="relative overflow-hidden min-h-[450px]">
+        <div className="relative overflow-hidden min-h-[450px]" onChangeCapture={trackFormStart} onClickCapture={trackFormStart}>
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
+              data-analytics-step={step}
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -875,8 +907,24 @@ const Footer = () => (
 );
 
 export default function App() {
+  const journeyRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const root = journeyRef.current;
+    if (!root) return;
+    const sections = [
+      ['main > section:first-child', 'introduction'],
+      ['#gallery', 'inspiration_gallery'],
+      ['#process', 'process'],
+      ['#estimate', 'estimate_form'],
+      ['footer', 'general_information'],
+    ];
+    sections.forEach(([selector, name]) => {
+      root.querySelector<HTMLElement>(selector)?.setAttribute('data-analytics-section', name);
+    });
+    return observeJourney(root);
+  }, []);
   return (
-    <div className="min-h-screen">
+    <div ref={journeyRef} className="min-h-screen">
       <Header />
       
       <main>
