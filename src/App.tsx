@@ -5,6 +5,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { observeJourney, stepParameters, trackEvent } from './analytics';
+import Reviews from './Reviews';
 import { motion, AnimatePresence } from 'motion/react';
 
 const StaggeredIcon = '/assets/staggered.svg';
@@ -856,6 +857,10 @@ const Footer = () => (
           <p className="text-slate-400 max-w-sm mb-8">
             Queen City's premier backsplash installation experts. Fully insured with 5+ years of experience transforming modern kitchens.
           </p>
+          <p className="text-slate-400 max-w-sm mb-6">
+            Queen City Backsplash is a division of{' '}
+            <a href="https://vadconstructions.com/" target="_blank" rel="noopener noreferrer" className="text-white underline underline-offset-4 hover:text-brand-gold-light">VAD Constructions</a>.
+          </p>
           <div className="flex gap-4">
             <a href="#" className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center hover:bg-slate-700 transition-colors">
               <Instagram className="w-5 h-5" />
@@ -950,6 +955,10 @@ export default function App() {
               <h1 className="text-6xl md:text-8xl font-bold text-slate-900 leading-[0.9] mb-8 tracking-tighter">
                 Queen City's Premier <span className="text-brand-teal italic">Backsplash</span> Experts.
               </h1>
+              <p className="text-sm font-semibold text-brand-teal mb-5">
+                A backsplash division of{' '}
+                <a href="https://vadconstructions.com/" target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">VAD Constructions</a>
+              </p>
               <p className="text-xl text-slate-600 mb-10 max-w-xl leading-relaxed">
                 Professional backsplash installation for subway, herringbone, glass, and solid panels. Get a free estimate in minutes.
               </p>
@@ -980,6 +989,7 @@ export default function App() {
 
         <Gallery />
         <Process />
+        <Reviews />
         <EstimateForm />
       </main>
 
