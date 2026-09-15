@@ -11,6 +11,7 @@ import Hero from './Hero';
 import CompletedProjects from './CompletedProjects';
 import MobileContactBar from './MobileContactBar';
 import Reviews from './Reviews';
+import CustomerReviews from './CustomerReviews';
 import ServiceArea from './ServiceArea';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -67,7 +68,7 @@ const Header = () => (
       </div>
       
       <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-600">
-        <a href="#gallery" className="hover:text-brand-teal transition-colors">Gallery</a>
+        <a href="#completed-projects" className="hover:text-brand-teal transition-colors">Our Work</a>
         <a href="#estimate" className="hover:text-brand-teal transition-colors">Personal Quote</a>
         <a href="#process" className="hover:text-brand-teal transition-colors">Our Process</a>
         <a href="#service-area" className="hover:text-brand-teal transition-colors">Service Area</a>
@@ -115,8 +116,7 @@ const Gallery = () => {
   };
 
   return (
-    <section id="gallery" className="py-24 bg-slate-50 overflow-hidden">
-      <CompletedProjects />
+    <section id="gallery" className="py-24 bg-slate-50 overflow-hidden scroll-mt-20">
       <div className="max-w-7xl mx-auto px-4 mb-12 flex items-end justify-between">
         <div>
           <h2 className="text-4xl font-bold text-slate-900 mb-4">Inspiration Gallery</h2>
@@ -351,7 +351,8 @@ const Footer = () => (
         <div>
           <h4 className="font-bold mb-6">Quick Links</h4>
           <ul className="space-y-4 text-slate-400">
-            <li><a href="#gallery" className="hover:text-white transition-colors">Gallery</a></li>
+            <li><a href="#completed-projects" className="hover:text-white transition-colors">Completed Projects</a></li>
+            <li><a href="#gallery" className="hover:text-white transition-colors">Inspiration Gallery</a></li>
             <li><a href="#estimate" className="hover:text-white transition-colors">Personal Quote</a></li>
             <li><a href="#process" className="hover:text-white transition-colors">Our Process</a></li>
             <li><a href="#service-area" className="hover:text-white transition-colors">Service Area</a></li>
@@ -378,6 +379,7 @@ export default function App() {
     if (!root) return;
     const sections = [
       ['main > section:first-child', 'introduction'],
+      ['#completed-projects', 'completed_projects'],
       ['#gallery', 'inspiration_gallery'],
       ['#process', 'process'],
       ['#service-area', 'service_area'],
@@ -395,11 +397,13 @@ export default function App() {
       
       <main>
         <Hero />
+        <CompletedProjects />
         <Reviews />
-        <InquiryForm />
+        <CustomerReviews />
         <Gallery />
         <Process />
         <ServiceArea />
+        <InquiryForm />
       </main>
 
       <Footer />
