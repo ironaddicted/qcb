@@ -1,4 +1,5 @@
 import { ArrowRight, MapPin } from 'lucide-react';
+import { trackQuoteCtaClick } from './analytics';
 
 const communities = [
   'Charlotte', 'Matthews', 'Mint Hill', 'Weddington', 'Waxhaw',
@@ -28,7 +29,7 @@ export default function ServiceArea() {
             ))}
           </ul>
           <p className="text-sm text-slate-500 mt-6">Don't see your town? Enter your ZIP code in our quote request form to check coverage.</p>
-          <a href="#estimate" className="inline-flex items-center gap-2 mt-7 bg-brand-teal text-white px-7 py-4 rounded-xl font-bold hover:bg-brand-teal/90 transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-teal">
+          <a href="#estimate" onClick={() => trackQuoteCtaClick('service_area')} className="inline-flex items-center gap-2 mt-7 bg-brand-teal text-white px-7 py-4 rounded-xl font-bold hover:bg-brand-teal/90 transition-colors focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-teal">
             Request My Personal Quote <ArrowRight className="w-5 h-5" aria-hidden="true" />
           </a>
         </div>

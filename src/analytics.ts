@@ -1,21 +1,28 @@
-type Parameters = Record<string, string | number>;
+type Parameters = Record<string, string | number | boolean>;
 type AnalyticsWindow = Window & {
   gtag?: (command: string, name: string, parameters?: Parameters) => void;
 };
 
 const measurementId = (import.meta as ImportMeta & {
-  env: Record<string, string | undefined>;
+  env: { VITE_GA4_MEASUREMENT_ID?: string };
 }).env.VITE_GA4_MEASUREMENT_ID ?? 'G-XMQGDWGHL2';
 const enabled = /^G-[A-Z0-9]+$/.test(measurementId ?? '');
+const isDevelopment = (import.meta as ImportMeta & { env: { DEV?: boolean } }).env.DEV;
 
 // Explicit routing keeps browsing events separate from Google Ads conversions.
 export function trackEvent(name: string, parameters: Parameters = {}) {
   if (!enabled) return;
   try {
-    (window as AnalyticsWindow).gtag?.('event', name, {
+    const gtag = (window as AnalyticsWindow).gtag;
+    if (!gtag) return;
+    gtag('event', name, {
       ...parameters,
       send_to: measurementId!,
+      ...(isDevelopment && new URLSearchParams(window.location.search).has('analytics_debug') ? { debug_mode: true } : {}),
     });
+    if (isDevelopment && new URLSearchParams(window.location.search).has('analytics_debug')) {
+      console.debug('[GA4 event]', name, parameters);
+    }
   } catch {
     // Analytics must never interrupt the visitor's form or navigation.
   }
@@ -23,6 +30,23 @@ export function trackEvent(name: string, parameters: Parameters = {}) {
 
 export function initializeAnalytics() {
   if (enabled) (window as AnalyticsWindow).gtag?.('config', measurementId!);
+}
+
+export function trackQuoteCtaClick(placement: string) {
+  trackEvent('quote_cta_click', { placement, link_url: '#estimate' });
+}
+
+export function trackContactClick(method: 'call' | 'sms', placement: string, linkUrl: string) {
+  trackEvent('contact_click', { method, placement });
+  trackEvent(method === 'call' ? 'phone_click' : 'text_click', { link_url: linkUrl, placement });
+}
+
+export function trackAdsEstimateConversion() {
+  try {
+    (window as AnalyticsWindow).gtag?.('event', 'conversion', {
+      send_to: 'AW-16582460982/cr4VCNeZ2bMZELaMkeM9', value: 1, currency: 'USD',
+    });
+  } catch { /* Tracking must not interrupt a successful inquiry. */ }
 }
 
 export const FORM_STEPS = [

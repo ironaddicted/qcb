@@ -28,7 +28,7 @@ function setup(id = 'G-TEST123') {
   const source = fs.readFileSync(__dirname + '/analytics.ts', 'utf8');
   const compiled = ts.transpileModule(source, {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
-  }).outputText.replace('import.meta', JSON.stringify({ env: { VITE_GA4_MEASUREMENT_ID: id } }));
+  }).outputText.replaceAll('import.meta', JSON.stringify({ env: { VITE_GA4_MEASUREMENT_ID: id, DEV: false } }));
   vm.runInNewContext(compiled, context);
   const flush = () => { const pending = [...timers.values()]; timers.clear(); pending.forEach(fn => fn()); };
   const element = (dataset, top = 80) => ({ dataset, top,
@@ -50,6 +50,19 @@ test('routes only to configured GA4 and tolerates unavailable analytics', () => 
   const disabled = setup('');
   disabled.api.initializeAnalytics(); disabled.api.trackEvent('section_view');
   assert.equal(disabled.events.length, 0);
+});
+
+test('business contacts and quote CTAs have distinct GA4 event names', () => {
+  const s = setup();
+  s.api.trackQuoteCtaClick('hero');
+  s.api.trackContactClick('call', 'mobile_bar', 'tel:+17047509110');
+  s.api.trackContactClick('sms', 'mobile_bar', 'sms:+17047509110');
+  assert.deepEqual(s.events.map(event => event[1]), [
+    'quote_cta_click', 'contact_click', 'phone_click', 'contact_click', 'text_click',
+  ]);
+  assert.equal(s.events[0][2].placement, 'hero');
+  assert.equal(s.events[2][2].link_url, 'tel:+17047509110');
+  assert.equal(s.events[4][2].link_url, 'sms:+17047509110');
 });
 
 test('offscreen form is not counted; visible section counts once', () => {

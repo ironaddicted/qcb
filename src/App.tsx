@@ -4,7 +4,8 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { observeJourney } from './analytics';
+import { observeJourney, trackContactClick, trackQuoteCtaClick } from './analytics';
+import { CALL_URL } from './contact';
 import InquiryForm from './InquiryForm';
 import Hero from './Hero';
 import CompletedProjects from './CompletedProjects';
@@ -73,11 +74,11 @@ const Header = () => (
       </nav>
 
       <div className="flex items-center gap-4">
-        <a href="tel:+17047509110" className="hidden sm:flex items-center gap-2 text-sm font-semibold text-slate-900">
+        <a href={CALL_URL} onClick={() => trackContactClick('call', 'header', CALL_URL)} className="hidden sm:flex items-center gap-2 text-sm font-semibold text-slate-900">
           <Phone className="w-4 h-4 text-brand-teal" />
           (704) 750-9110
         </a>
-        <a href="#estimate" className="bg-brand-teal text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-brand-teal/90 transition-all shadow-lg shadow-brand-teal/20">
+        <a href="#estimate" onClick={() => trackQuoteCtaClick('header')} className="bg-brand-teal text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-brand-teal/90 transition-all shadow-lg shadow-brand-teal/20">
           Get a Quote
         </a>
       </div>
@@ -288,7 +289,7 @@ const Process = () => {
             <h3 className="text-2xl font-bold mb-2">Ready to transform your kitchen?</h3>
             <p className="text-slate-500">Talk with us about your kitchen and request a personal installation quote.</p>
           </div>
-          <a href="#estimate" className="bg-brand-teal text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-teal/90 transition-all flex items-center gap-2 shrink-0">
+          <a href="#estimate" onClick={() => trackQuoteCtaClick('process')} className="bg-brand-teal text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-teal/90 transition-all flex items-center gap-2 shrink-0">
             Request My Personal Quote
             <ArrowRight className="w-5 h-5" />
           </a>
@@ -338,7 +339,7 @@ const Footer = () => (
             </li>
             <li className="flex items-center gap-3">
               <Phone className="w-5 h-5 text-slate-500 shrink-0" />
-              <a href="tel:+17047509110" className="hover:text-white underline underline-offset-4">(704) 750-9110</a>
+              <a href={CALL_URL} onClick={() => trackContactClick('call', 'footer', CALL_URL)} className="hover:text-white underline underline-offset-4">(704) 750-9110</a>
             </li>
             <li className="flex items-center gap-3">
               <Mail className="w-5 h-5 text-slate-500 shrink-0" />

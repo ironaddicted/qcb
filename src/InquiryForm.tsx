@@ -1,6 +1,6 @@
 import { useRef, useState, type FormEvent } from 'react';
 import { ArrowRight, CheckCircle, MessageSquare, Phone } from 'lucide-react';
-import { trackEvent } from './analytics';
+import { trackAdsEstimateConversion, trackContactClick, trackEvent } from './analytics';
 import { isZipInServiceArea } from './serviceAreaData';
 import { Inquiry, submitInquiry, validateInquiry } from './inquiry';
 import { CALL_URL, TEXT_URL, RESPONSE_TIME } from './contact';
@@ -42,12 +42,9 @@ export default function InquiryForm() {
     }
     setSuccess(true);
     setPending(false);
+    trackEvent('estimate_submit', eventDetails);
     trackEvent('generate_lead', eventDetails);
-    try {
-      (window as Window & { gtag?: (...args: unknown[]) => void }).gtag?.('event', 'conversion', {
-        send_to: 'AW-16582460982/cr4VCNeZ2bMZELaMkeM9', value: 1.0, currency: 'USD',
-      });
-    } catch { /* Accepted inquiries remain successful if tracking is blocked. */ }
+    trackAdsEstimateConversion();
   };
 
   return (
@@ -59,7 +56,7 @@ export default function InquiryForm() {
           <p className="text-slate-600 leading-relaxed mb-4">Just your contact details. Our team will discuss your kitchen, help with measurements, and prepare a personal quote.</p>
           <p className="font-semibold text-brand-teal mb-6">{RESPONSE_TIME}</p>
           <p className="text-sm text-slate-500 mb-6">No measurements or material decisions needed. This is a free quote request; your project price follows a conversation about the work.</p>
-          <a href={CALL_URL} className="inline-flex items-center gap-2 font-semibold text-brand-teal underline underline-offset-4"><Phone className="w-4 h-4" /> Prefer to talk? Call Us</a>
+          <a href={CALL_URL} onClick={() => trackContactClick('call', 'inquiry_intro', CALL_URL)} className="inline-flex items-center gap-2 font-semibold text-brand-teal underline underline-offset-4"><Phone className="w-4 h-4" /> Prefer to talk? Call Us</a>
         </div>
         <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm">
           {success ? (
@@ -68,7 +65,7 @@ export default function InquiryForm() {
               <h3 className="text-2xl font-bold">Thanks, {data.name.trim()} — your request is in.</h3>
               <p className="text-slate-600">We’ll contact you at {data.phone}. {RESPONSE_TIME}</p>
               <p className="text-slate-600">Next, we’ll talk through your backsplash, measurements, material options, and installation needs.</p>
-              <a href={TEXT_URL} onClick={() => trackEvent('contact_click', { method: 'sms', placement: 'confirmation' })} className="inline-flex gap-2 items-center font-semibold text-brand-teal underline underline-offset-4"><MessageSquare className="w-5 h-5" /> Text Kitchen Photos (optional)</a>
+              <a href={TEXT_URL} onClick={() => trackContactClick('sms', 'confirmation', TEXT_URL)} className="inline-flex gap-2 items-center font-semibold text-brand-teal underline underline-offset-4"><MessageSquare className="w-5 h-5" /> Text Kitchen Photos (optional)</a>
               <p className="text-sm text-slate-500">Attach your photos in your messaging app and include your name so we can match them to your request.</p>
             </div>
           ) : (
@@ -94,7 +91,7 @@ export default function InquiryForm() {
                 ))}
               </fieldset>
               <div className="mt-5 rounded-xl bg-slate-50 p-4">
-                <a href={TEXT_URL} onClick={() => trackEvent('contact_click', { method: 'sms', placement: 'inquiry' })} className="inline-flex items-center gap-2 font-semibold text-brand-teal underline underline-offset-4"><MessageSquare className="w-5 h-5" /> Text Kitchen Photos (optional)</a>
+                <a href={TEXT_URL} onClick={() => trackContactClick('sms', 'inquiry', TEXT_URL)} className="inline-flex items-center gap-2 font-semibold text-brand-teal underline underline-offset-4"><MessageSquare className="w-5 h-5" /> Text Kitchen Photos (optional)</a>
                 <p className="text-sm text-slate-500 mt-2">Have a photo handy? Attach it in your messaging app. You can also send it after requesting your quote.</p>
               </div>
               {submissionError && <p role="alert" className="text-red-700 mt-5">{submissionError}</p>}
