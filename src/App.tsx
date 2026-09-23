@@ -68,6 +68,7 @@ const Header = () => (
       </div>
       
       <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-600">
+        <a href="/cost-estimator" className="hover:text-brand-teal transition-colors">Cost Estimator</a>
         <a href="#completed-projects" className="hover:text-brand-teal transition-colors">Our Work</a>
         <a href="#estimate" className="hover:text-brand-teal transition-colors">Personal Quote</a>
         <a href="#process" className="hover:text-brand-teal transition-colors">Our Process</a>
@@ -351,6 +352,7 @@ const Footer = () => (
         <div>
           <h4 className="font-bold mb-6">Quick Links</h4>
           <ul className="space-y-4 text-slate-400">
+            <li><a href="/cost-estimator" className="hover:text-white transition-colors">Cost Estimator</a></li>
             <li><a href="#completed-projects" className="hover:text-white transition-colors">Completed Projects</a></li>
             <li><a href="#gallery" className="hover:text-white transition-colors">Inspiration Gallery</a></li>
             <li><a href="#estimate" className="hover:text-white transition-colors">Personal Quote</a></li>
