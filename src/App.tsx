@@ -8,6 +8,7 @@ import { observeJourney, trackContactClick, trackQuoteCtaClick } from './analyti
 import { CALL_URL } from './contact';
 import InquiryForm from './InquiryForm';
 import Hero from './Hero';
+import EstimatorSection from './EstimatorSection';
 import CompletedProjects from './CompletedProjects';
 import MobileContactBar from './MobileContactBar';
 import Reviews from './Reviews';
@@ -399,6 +400,7 @@ export default function App() {
       
       <main>
         <Hero />
+        <EstimatorSection />
         <CompletedProjects />
         <Reviews />
         <CustomerReviews />

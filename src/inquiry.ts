@@ -5,6 +5,33 @@ export interface Inquiry {
   email: string;
 }
 
+export interface BacksplashConfiguration {
+  version: 1;
+  demolition: boolean;
+  pattern: string;
+  material: string;
+  color: string;
+  colorLabel: string;
+  previewImage: string;
+  measurement: {
+    method: 'measure' | 'cabinets' | 'area';
+    areaSqFt: number;
+    lengthFeet: number | null;
+    cabinetCount: number | null;
+    assumedCabinetWidthInches: number | null;
+    assumedHeightInches: number | null;
+  };
+  pricing: {
+    currency: 'USD';
+    installationLabor: number | null;
+    demolitionAndDrywallLabor: number;
+    totalLabor: number | null;
+    materialsAllowance: number | null;
+    planningTotal: number | null;
+    materialsAllowanceIsEstimate: true;
+  };
+}
+
 export const INQUIRY_ENDPOINT = 'https://htmczrw2tgityftpxj5535hdye0zreqf.lambda-url.us-east-1.on.aws';
 
 export function validateInquiry(data: Inquiry, covered: (zip: string) => boolean) {
@@ -20,10 +47,12 @@ export function validateInquiry(data: Inquiry, covered: (zip: string) => boolean
   return errors;
 }
 
-export async function submitInquiry(data: Inquiry, request: typeof fetch = fetch) {
+export async function submitInquiry(data: Inquiry, request: typeof fetch = fetch, configuration?: BacksplashConfiguration) {
   const response = await request(INQUIRY_ENDPOINT, {
     method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain' },
-    body: JSON.stringify({ source: 'qcb', name: data.name.trim(), phone: data.phone.trim(), zip: data.zip.trim(), email: data.email.trim() }),
+    body: JSON.stringify({ source: 'qcb', name: data.name.trim(), phone: data.phone.trim(), zip: data.zip.trim(), email: data.email.trim(),
+      ...(configuration ? { inquiryType: 'cost_estimator', backsplash: configuration } : {}),
+    }),
   });
   if (!response.ok) throw new Error(`Submission failed with status ${response.status}`);
 }

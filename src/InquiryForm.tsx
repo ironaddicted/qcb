@@ -2,12 +2,12 @@ import { useRef, useState, type FormEvent } from 'react';
 import { ArrowRight, CheckCircle, MessageSquare, Phone } from 'lucide-react';
 import { trackAdsEstimateConversion, trackContactClick, trackEvent } from './analytics';
 import { isZipInServiceArea } from './serviceAreaData';
-import { Inquiry, submitInquiry, validateInquiry } from './inquiry';
+import { Inquiry, type BacksplashConfiguration, submitInquiry, validateInquiry } from './inquiry';
 import { CALL_URL, TEXT_URL, RESPONSE_TIME } from './contact';
 
-const eventDetails = { form_id: 'estimate', form_version: 'short_inquiry', step_name: 'quick_inquiry', step_number: 1 };
-
-export default function InquiryForm() {
+export default function InquiryForm({ configuration }: { configuration?: BacksplashConfiguration } = {}) {
+  const compact = Boolean(configuration);
+  const eventDetails = { form_id: compact ? 'estimator_quote' : 'estimate', form_version: compact ? 'configured_inquiry' : 'short_inquiry', step_name: 'quick_inquiry', step_number: 1 };
   const [data, setData] = useState<Inquiry>({ name: '', phone: '', zip: '', email: '' });
   const [errors, setErrors] = useState<Partial<Record<keyof Inquiry, string>>>({});
   const [pending, setPending] = useState(false);
@@ -32,7 +32,7 @@ export default function InquiryForm() {
     setSubmissionError('');
     trackEvent('estimate_submit_attempt', eventDetails);
     try {
-      await submitInquiry(data);
+      await submitInquiry(data, fetch, configuration);
     } catch {
       locked.current = false;
       setPending(false);
@@ -48,14 +48,14 @@ export default function InquiryForm() {
   };
 
   return (
-    <section id="estimate" data-analytics-section="estimate_form" className="py-16 md:py-24 bg-slate-50 scroll-mt-24" aria-labelledby="inquiry-heading">
-      <div className="max-w-5xl mx-auto px-4 grid lg:grid-cols-[0.8fr_1fr] gap-10 lg:gap-16">
+    <section id="estimate" data-analytics-section="estimate_form" className={compact ? 'mt-8 scroll-mt-24' : 'py-16 md:py-24 bg-slate-50 scroll-mt-24'} aria-labelledby="inquiry-heading">
+      <div className={compact ? 'grid gap-5' : 'max-w-5xl mx-auto px-4 grid lg:grid-cols-[0.8fr_1fr] gap-10 lg:gap-16'}>
         <div>
           <p className="text-brand-teal text-xs font-bold uppercase tracking-widest mb-4">Let’s talk about your kitchen</p>
-          <h2 id="inquiry-heading" className="text-3xl md:text-4xl font-bold mb-5">Your personal backsplash quote starts here.</h2>
-          <p className="text-slate-600 leading-relaxed mb-4">Just your contact details. Our team will discuss your kitchen, help with measurements, and prepare a personal quote.</p>
+          <h2 id="inquiry-heading" className="text-3xl md:text-4xl font-bold mb-5">{compact ? 'Get a quote for this backsplash.' : 'Your personal backsplash quote starts here.'}</h2>
+          <p className="text-slate-600 leading-relaxed mb-4">{compact ? 'Send your contact details together with your selected tile, pattern, color, measurements, and estimate. We’ll review your plan and contact you to confirm your personal quote.' : 'Just your contact details. Our team will discuss your kitchen, help with measurements, and prepare a personal quote.'}</p>
           <p className="font-semibold text-brand-teal mb-6">{RESPONSE_TIME}</p>
-          <p className="text-sm text-slate-500 mb-6">No measurements or material decisions needed. This is a free quote request; your project price follows a conversation about the work.</p>
+          <p className="text-sm text-slate-500 mb-6">{compact ? 'Your current selections are included automatically. Materials remain a planning allowance until your products are confirmed.' : 'No measurements or material decisions needed. This is a free quote request; your project price follows a conversation about the work.'}</p>
           <a href={CALL_URL} onClick={() => trackContactClick('call', 'inquiry_intro', CALL_URL)} className="inline-flex items-center gap-2 font-semibold text-brand-teal underline underline-offset-4"><Phone className="w-4 h-4" /> Prefer to talk? Call Us</a>
         </div>
         <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm">
