@@ -6,7 +6,21 @@ import {defineConfig, loadEnv} from 'vite';
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [react(), tailwindcss(), {
+      name: 'static-estimator-entry',
+      enforce: 'post',
+      generateBundle: {
+        order: 'post',
+        handler(_options, bundle) {
+          const entry = bundle['index.html'];
+          if (!entry || entry.type !== 'asset') {
+            this.error('Missing built index.html for the cost estimator entry.');
+          }
+          // Apache can serve this directory directly without an SPA rewrite.
+          this.emitFile({ type: 'asset', fileName: 'cost-estimator/index.html', source: entry.source });
+        },
+      },
+    }],
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
     },
