@@ -11,7 +11,7 @@ export default function Hero() {
           <p className="text-xs font-bold uppercase tracking-widest text-brand-teal mb-2 sm:mb-4">Charlotte & surrounding communities</p>
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.08] mb-3 sm:mb-5">Kitchen Backsplash Installation in <span className="text-brand-teal">Charlotte, NC</span></h1>
           <div className="flex flex-col sm:flex-row flex-wrap gap-3">
-            <a href="/cost-estimator/" className="inline-flex items-center justify-center gap-2 bg-brand-teal text-white rounded-xl px-5 py-3 sm:px-6 sm:py-4 font-bold hover:bg-brand-teal/90">Estimate My Cost <ArrowRight className="w-5 h-5" /></a>
+            <a href="/cost-estimator/" data-estimator-entry="hero" className="inline-flex items-center justify-center gap-2 bg-brand-teal text-white rounded-xl px-5 py-3 sm:px-6 sm:py-4 font-bold hover:bg-brand-teal/90">Estimate My Cost <ArrowRight className="w-5 h-5" /></a>
             <a href="#estimate" onClick={() => trackQuoteCtaClick('hero')} className="inline-flex items-center justify-center gap-2 border border-brand-teal text-brand-teal rounded-xl px-5 py-3 sm:px-6 sm:py-4 font-bold">Request a Personal Quote</a>
           </div>
         </div>
@@ -33,3 +33,4 @@ export default function Hero() {
     </section>
   );
 }
+

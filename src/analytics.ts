@@ -28,8 +28,18 @@ export function trackEvent(name: string, parameters: Parameters = {}) {
   }
 }
 
+let estimatorLinksTracked = false;
 export function initializeAnalytics() {
   if (enabled) (window as AnalyticsWindow).gtag?.('config', measurementId!);
+  if (!estimatorLinksTracked && typeof document.addEventListener === 'function') {
+    estimatorLinksTracked = true;
+    document.addEventListener('click', event => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const link = target.closest<HTMLAnchorElement>('a[data-estimator-entry]');
+      if (link) trackEvent('estimator_cta_click', { placement: link.dataset.estimatorEntry!, transport_type: 'beacon' });
+    });
+  }
 }
 
 export function trackQuoteCtaClick(placement: string) {

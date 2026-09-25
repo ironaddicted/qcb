@@ -57,3 +57,41 @@ after verification. `estimate_start` and `quote_cta_click` are funnel events.
 Generic automatic `click` is not a lead. If `generate_lead` is already a key
 event, review it before also marking `estimate_submit` so a submission is not
 counted twice as a primary lead.
+
+## Cost estimator tracking
+
+The separate /cost-estimator page now has its own four-step builder plus results and a configured quote form. These events are separate from the homepage's short inquiry events. All use the existing GA4 destination; browsing events do not fire Google Ads conversions.
+
+| Event | Trigger |
+| --- | --- |
+| estimator_cta_click | Homepage entry click; placement distinguishes hero, mobile_bar, homepage_section, navigation |
+| estimator_open | Builder mounts, once per page instance |
+| estimator_start | First actual change to removal, pattern, material, color, or measurement method |
+| estimator_step_view | Preparation (1), pattern (2), material (3), measurements (4), results (5); revisits included |
+| estimator_step_complete | Forward navigation, with the completed step and visible-tab duration |
+| estimator_back | Back/edit navigation, including destination_step |
+| estimator_selection | Changed option, selection_type and selection_value; defaults and repeated selection of same value excluded |
+| estimator_result_view | Each arrival at results with current preferences |
+| estimator_quote_view | Quote section first intersects viewport by 10% per form mount |
+| estimator_quote_start | First contact-field edit; no field values transmitted |
+| estimator_quote_validation_error | Submission blocked by validation; no error strings or contact values |
+| estimator_quote_attempt | Valid request sent |
+| estimator_quote_error | Request failed |
+| estimator_quote_success | Existing Lambda returns HTTP success |
+| estimator_exit | pagehide, current step, quote_submitted, estimator_started, visible-tab duration |
+
+Preference parameters: tile_pattern, tile_material, tile_color, measurement_method, removal_needed, area_band. Area is bucketed, not sent as exact measurements. No name, phone, email, ZIP, preview URL, or quote JSON is passed to these events. step_duration_seconds measures elapsed visible-tab time, not guaranteed active attention. Exit dispatch is best-effort: mobile process termination, network loss, blockers, or disabled analytics can prevent it. Switching tabs alone does not count as abandonment. Browser back/forward-cache restoration allows a later exit to be recorded.
+
+### GA4 reporting setup (requires access to the property)
+
+1. Admin → Custom definitions: create event-scoped dimensions for step_name, step_number, tile_pattern, tile_material, tile_color, measurement_method, removal_needed, area_band, selection_type, selection_value, placement, quote_submitted, and destination_step. Reuse definitions already present. Add step_duration_seconds as a custom metric with seconds as its unit.
+2. Explore → Funnel exploration: create sequential steps filtered by estimator_step_view and step_name: preparation → pattern → material → measurements → results; then estimator_quote_start → estimator_quote_success. Allow intervening events. Break down by Device category to compare mobile and desktop.
+3. Preferences: filter estimator_result_view or estimator_quote_success, use tile_color / tile_material / tile_pattern as rows and Total users as the metric. This measures configurations reached or submitted; estimator_selection event counts instead measure exploration and repeated changes, not unique client preference votes.
+4. Use estimator_exit grouped by step_name with quote_submitted=false as supplementary diagnostics. Funnel non-completion is the primary drop-off measure; no exit event does not mean no abandonment.
+5. Existing generate_lead / estimate_submit and Ads conversion still fire after success. Do not mark another equivalent event as an additional primary conversion without reviewing double counting.
+6. Validate in Realtime or local ?analytics_debug DebugView after deploying. Custom dimensions may require 24–48 hours before reporting. No live leads were submitted during local tests.
+
+Official references:
+- https://support.google.com/analytics/answer/14239696
+- https://support.google.com/analytics/answer/9327974
+- https://support.google.com/analytics/answer/14240153

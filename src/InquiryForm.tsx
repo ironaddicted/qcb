@@ -1,11 +1,11 @@
-import { useRef, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { ArrowRight, CheckCircle, MessageSquare, Phone } from 'lucide-react';
 import { trackAdsEstimateConversion, trackContactClick, trackEvent } from './analytics';
 import { isZipInServiceArea } from './serviceAreaData';
 import { Inquiry, type BacksplashConfiguration, submitInquiry, validateInquiry } from './inquiry';
 import { CALL_URL, TEXT_URL, RESPONSE_TIME } from './contact';
 
-export default function InquiryForm({ configuration }: { configuration?: BacksplashConfiguration } = {}) {
+export default function InquiryForm({ configuration, onEstimatorEvent }: { configuration?: BacksplashConfiguration; onEstimatorEvent?: (action: 'start' | 'validation_error' | 'attempt' | 'error' | 'success' | 'view') => void } = {}) {
   const compact = Boolean(configuration);
   const eventDetails = { form_id: compact ? 'estimator_quote' : 'estimate', form_version: compact ? 'configured_inquiry' : 'short_inquiry', step_name: 'quick_inquiry', step_number: 1 };
   const [data, setData] = useState<Inquiry>({ name: '', phone: '', zip: '', email: '' });
@@ -17,30 +17,42 @@ export default function InquiryForm({ configuration }: { configuration?: Backspl
   const started = useRef(false);
   const errorSummary = useRef<HTMLDivElement>(null);
 
+  const formRoot = useRef<HTMLElement>(null);
+  const viewed = useRef(false);
+  useEffect(() => {
+    if (!onEstimatorEvent || !formRoot.current) return;
+    const observer = new IntersectionObserver(entries => {
+      if (!viewed.current && entries.some(entry => entry.isIntersecting)) {
+        viewed.current = true; onEstimatorEvent('view');
+      }
+    }, { threshold: 0.1 });
+    observer.observe(formRoot.current);
+    return () => observer.disconnect();
+  }, [onEstimatorEvent]);
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (locked.current) return;
     const validation = validateInquiry(data, isZipInServiceArea);
     setErrors(validation);
     if (Object.keys(validation).length) {
-      trackEvent('estimate_validation_error', eventDetails);
+      trackEvent('estimate_validation_error', eventDetails); onEstimatorEvent?.('validation_error');
       requestAnimationFrame(() => errorSummary.current?.focus());
       return;
     }
     locked.current = true;
     setPending(true);
     setSubmissionError('');
-    trackEvent('estimate_submit_attempt', eventDetails);
+    trackEvent('estimate_submit_attempt', eventDetails); onEstimatorEvent?.('attempt');
     try {
       await submitInquiry(data, fetch, configuration);
     } catch {
       locked.current = false;
       setPending(false);
       setSubmissionError('We couldn’t confirm your request. Please try again, or call/text us directly.');
-      trackEvent('estimate_submit_error', eventDetails);
+      trackEvent('estimate_submit_error', eventDetails); onEstimatorEvent?.('error');
       return;
     }
-    setSuccess(true);
+    setSuccess(true); onEstimatorEvent?.('success');
     setPending(false);
     trackEvent('estimate_submit', eventDetails);
     trackEvent('generate_lead', eventDetails);
@@ -48,7 +60,7 @@ export default function InquiryForm({ configuration }: { configuration?: Backspl
   };
 
   return (
-    <section id="estimate" data-analytics-section="estimate_form" className={compact ? 'mt-8 scroll-mt-24' : 'py-16 md:py-24 bg-slate-50 scroll-mt-24'} aria-labelledby="inquiry-heading">
+    <section ref={formRoot} id="estimate" data-analytics-section="estimate_form" className={compact ? 'mt-8 scroll-mt-24' : 'py-16 md:py-24 bg-slate-50 scroll-mt-24'} aria-labelledby="inquiry-heading">
       <div className={compact ? 'grid gap-5' : 'max-w-5xl mx-auto px-4 grid lg:grid-cols-[0.8fr_1fr] gap-10 lg:gap-16'}>
         <div>
           <p className="text-brand-teal text-xs font-bold uppercase tracking-widest mb-4">Let’s talk about your kitchen</p>
@@ -70,7 +82,7 @@ export default function InquiryForm({ configuration }: { configuration?: Backspl
             </div>
           ) : (
             <form onSubmit={submit} noValidate data-analytics-inquiry="true" onChange={() => {
-              if (!started.current) { started.current = true; trackEvent('estimate_start', eventDetails); }
+              if (!started.current) { started.current = true; trackEvent('estimate_start', eventDetails); onEstimatorEvent?.('start'); }
             }}>
               {Object.values(errors).some(Boolean) && <div ref={errorSummary} tabIndex={-1} role="alert" className="text-red-700 mb-4">Please check the highlighted fields.</div>}
               <fieldset disabled={pending} className="grid sm:grid-cols-2 gap-5 disabled:opacity-60">
@@ -104,3 +116,4 @@ export default function InquiryForm({ configuration }: { configuration?: Backspl
     </section>
   );
 }
+
