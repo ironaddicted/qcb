@@ -83,7 +83,7 @@ export default function CostEstimator() {
   const field = (label: string, value: string, update: (value: string) => void, unit: string, whole = false) => <label className="est-field"><span>{label}</span><div><input type="number" min={whole ? '1' : '0.1'} step={whole ? '1' : 'any'} value={value} onChange={event => update(event.target.value)} placeholder="0" /><span>{unit}</span></div></label>;
   return <div className="est-page">
     <header className="est-header"><a href="/" className="est-brand"><Crown size={29} /><span>QUEEN CITY<small>BACKSPLASH</small></span></a><a href="/" className="est-home"><ArrowLeft size={16} /> Back to website</a></header>
-    <main className="est-main">
+    <main id="main-content" className="est-main">
       <div className="est-intro"><span className="est-eyebrow">YOUR KITCHEN, REIMAGINED</span><h1>Let’s plan your backsplash.</h1><p>A few simple details. A clearer picture of your project.</p></div>
       <div className="est-layout"><section className="est-card">
         <ol className="est-progress" aria-label="Estimator progress">{steps.map((label, i) => <li key={label} aria-current={!complete && step === i ? 'step' : undefined} className={complete || i <= step ? 'active' : ''}><span>{complete || i < step ? <Check size={15} /> : i + 1}</span><small>{label}</small></li>)}</ol>

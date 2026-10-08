@@ -40,14 +40,14 @@ export { SERVICE_AREA_ZIP_CODES, isZipInServiceArea } from './serviceAreaData';
 
 // --- Constants ---
 const GALLERY_SAMPLES = [
-  { id: 1, title: 'Vibrant Green Subway', type: 'Ceramic', url: '/assets/green_glass.jpg' },
-  { id: 2, title: 'Modern Checkerboard', type: 'Porcelain', url: '/assets/g_combined_white_grey_zellenge.png' },
-  { id: 3, title: 'Seamless Quartz Panel', type: 'Quartz', url: '/assets/g_pvc_backsplash.jpg' },
-  { id: 4, title: 'Artisan Green Square', type: 'Ceramic', url: '/assets/g_zellige_green.jpg' },
-  { id: 5, title: 'Classic White Subway', type: 'Ceramic', url: '/assets/gen_2.png' },
-  { id: 6, title: 'Emerald Glass Subway', type: 'Glass', url: '/assets/emerald_sub.png' },
-  { id: 7, title: 'Herringbone', type: 'Ceramic Herringbone', url: '/assets/black_herringbone.png' },
-  { id: 8, title: 'Penny Tile', type: 'Porcelain', url: '/assets/penny_tile.png' }
+  { id: 1, title: 'Vibrant Green Subway', type: 'Ceramic', url: '/assets/green_glass.webp' },
+  { id: 2, title: 'Modern Checkerboard', type: 'Porcelain', url: '/assets/g_combined_white_grey_zellenge.webp' },
+  { id: 3, title: 'Seamless Quartz Panel', type: 'Quartz', url: '/assets/g_pvc_backsplash.webp' },
+  { id: 4, title: 'Artisan Green Square', type: 'Ceramic', url: '/assets/g_zellige_green.webp' },
+  { id: 5, title: 'Classic White Subway', type: 'Ceramic', url: '/assets/gen_2.webp' },
+  { id: 6, title: 'Emerald Glass Subway', type: 'Glass', url: '/assets/emerald_sub.webp' },
+  { id: 7, title: 'Herringbone', type: 'Ceramic Herringbone', url: '/assets/black_herringbone.webp' },
+  { id: 8, title: 'Penny Tile', type: 'Porcelain', url: '/assets/penny_tile.webp' }
 ];
 
 // --- Components ---
@@ -148,6 +148,8 @@ const Gallery = () => {
               src={sample.url} 
               alt={sample.title} 
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              loading="lazy"
+              decoding="async"
               referrerPolicy="no-referrer"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8">
@@ -254,7 +256,7 @@ const Process = () => {
   ];
 
   return (
-    <section id="process" className="py-24 bg-slate-50">
+    <section id="process" className="py-24 bg-slate-50 scroll-mt-24">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-16">
           <span className="text-brand-teal font-bold uppercase tracking-widest text-xs mb-4 inline-block">How We Work</span>
@@ -398,7 +400,7 @@ export default function App() {
     <div ref={journeyRef} className="min-h-screen pb-[calc(84px+env(safe-area-inset-bottom))] sm:pb-0">
       <Header />
       
-      <main>
+      <main id="main-content">
         <Hero />
         <EstimatorSection />
         <CompletedProjects />
