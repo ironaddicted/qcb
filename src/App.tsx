@@ -22,7 +22,6 @@ import {
   ChevronLeft, 
   Phone, 
   Mail, 
-  MapPin, 
   Instagram, 
   Facebook, 
   ArrowRight,
@@ -81,8 +80,8 @@ const Header = () => (
           <Phone className="w-4 h-4 text-brand-teal" />
           (704) 750-9110
         </a>
-        <a href="#estimate" onClick={() => trackQuoteCtaClick('header')} className="bg-brand-teal text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-brand-teal/90 transition-all shadow-lg shadow-brand-teal/20">
-          Get a Quote
+        <a href="/cost-estimator/" data-estimator-entry="header" className="bg-brand-teal text-white px-3 sm:px-5 py-3 rounded-full text-xs sm:text-sm font-semibold text-center hover:bg-brand-teal/90 transition-all shadow-lg shadow-brand-teal/20">
+          Online Cost Estimator
         </a>
       </div>
     </div>
@@ -337,10 +336,6 @@ const Footer = () => (
         <div>
           <h4 className="font-bold mb-6">Contact Us</h4>
           <ul className="space-y-4 text-slate-400">
-            <li className="flex items-start gap-3">
-              <MapPin className="w-5 h-5 text-slate-500 shrink-0" />
-              <span>814 Evans Manor Dr<br />Weddington, NC 28104</span>
-            </li>
             <li className="flex items-center gap-3">
               <Phone className="w-5 h-5 text-slate-500 shrink-0" />
               <a href={CALL_URL} onClick={() => trackContactClick('call', 'footer', CALL_URL)} className="hover:text-white underline underline-offset-4">(704) 750-9110</a>

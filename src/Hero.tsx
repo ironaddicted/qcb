@@ -12,11 +12,11 @@ export default function Hero() {
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.08] mb-3 sm:mb-5">Kitchen Backsplash Installation in <span className="text-brand-teal">Charlotte, NC</span></h1>
           <p className="text-base sm:text-lg text-slate-600 leading-relaxed mb-5">Tile backsplash installation for Charlotte-area kitchens, from classic subway tile to herringbone and zellige. We help with measurements and tile choices, protect your countertops and cabinets, and handle installation, grout, and finishing.</p>
           <div className="flex flex-col sm:flex-row flex-wrap gap-3">
-            <a href="#estimate" onClick={() => trackQuoteCtaClick('hero')} className="inline-flex items-center justify-center gap-2 bg-brand-teal text-white rounded-xl px-5 py-3 sm:px-6 sm:py-4 font-bold hover:bg-brand-teal/90">Request a Free Quote <ArrowRight className="w-5 h-5" aria-hidden="true" /></a>
+            <a href="/cost-estimator/" data-estimator-entry="hero" className="inline-flex items-center justify-center gap-2 bg-brand-teal text-white rounded-xl px-5 py-3 sm:px-6 sm:py-4 font-bold hover:bg-brand-teal/90">Online Cost Estimator <ArrowRight className="w-5 h-5" aria-hidden="true" /></a>
+            <a href="#estimate" onClick={() => trackQuoteCtaClick('hero')} className="inline-flex items-center justify-center gap-2 border border-brand-teal text-brand-teal rounded-xl px-5 py-3 sm:px-6 sm:py-4 font-bold">Request a Free Quote</a>
             <a href={CALL_URL} onClick={() => trackContactClick('call', 'hero', CALL_URL)} className="inline-flex items-center justify-center gap-2 border border-brand-teal text-brand-teal rounded-xl px-5 py-3 sm:px-6 sm:py-4 font-bold"><Phone className="w-5 h-5" aria-hidden="true" />Call {PHONE_LABEL}</a>
           </div>
           <p className="text-sm text-slate-600 mt-3">No measurements needed to request a quote. {RESPONSE_TIME}</p>
-          <a href="/cost-estimator/" data-estimator-entry="hero" className="inline-flex items-center gap-2 min-h-11 mt-2 text-sm font-semibold text-brand-teal underline underline-offset-4">Explore tile styles &amp; estimate my cost <ArrowRight className="w-4 h-4" aria-hidden="true" /></a>
         </div>
         <figure className="overflow-hidden rounded-3xl bg-slate-100 border border-slate-200 lg:col-start-2 lg:row-span-2 lg:row-start-1">
           <img src="/assets/kannapolis-backsplash.webp" width="960" height="1280" fetchPriority="high" alt="VAD Constructions backsplash installation in Kannapolis with blue-gray tile, gray cabinets, and white countertops" className="w-full h-48 sm:h-[440px] lg:h-[600px] object-cover object-center" />
