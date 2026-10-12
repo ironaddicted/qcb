@@ -102,6 +102,15 @@ export default function InquiryForm({ configuration, onEstimatorEvent }: { confi
                   </div>
                 ))}
               </fieldset>
+              <details className="mt-5 rounded-xl border border-slate-200 p-4">
+                <summary className="cursor-pointer font-semibold text-brand-teal">Add project details (optional)</summary>
+                <label htmlFor="inquiry-timing" className="block text-sm font-semibold mt-4 mb-2">When are you considering installation?</label>
+                <select id="inquiry-timing" disabled={pending} value={data.timing || ''} onChange={event => setData({ ...data, timing: event.target.value })} className="w-full rounded-xl border border-slate-300 px-4 py-3">
+                  <option value="">Not sure yet</option><option>As soon as available</option><option>Within 1–3 months</option><option>Just planning</option>
+                </select>
+                <label htmlFor="inquiry-details" className="block text-sm font-semibold mt-4 mb-2">Anything we should know about your backsplash?</label>
+                <textarea id="inquiry-details" disabled={pending} maxLength={1500} value={data.details || ''} onChange={event => setData({ ...data, details: event.target.value })} rows={3} placeholder="Tile you like, existing tile to remove, or questions about the work" className="w-full rounded-xl border border-slate-300 px-4 py-3" />
+              </details>
               <div className="mt-5 rounded-xl bg-slate-50 p-4">
                 <a href={TEXT_URL} onClick={() => trackContactClick('sms', 'inquiry', TEXT_URL)} className="inline-flex items-center gap-2 font-semibold text-brand-teal underline underline-offset-4"><MessageSquare className="w-5 h-5" /> Text Kitchen Photos (optional)</a>
                 <p className="text-sm text-slate-500 mt-2">Have a photo handy? Attach it in your messaging app. You can also send it after requesting your quote.</p>

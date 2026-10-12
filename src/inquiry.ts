@@ -1,8 +1,12 @@
+import { leadContext } from './leadContext';
+
 export interface Inquiry {
   name: string;
   phone: string;
   zip: string;
   email: string;
+  timing?: string;
+  details?: string;
 }
 
 export interface BacksplashConfiguration {
@@ -48,9 +52,11 @@ export function validateInquiry(data: Inquiry, covered: (zip: string) => boolean
 }
 
 export async function submitInquiry(data: Inquiry, request: typeof fetch = fetch, configuration?: BacksplashConfiguration) {
+  const notes = [data.timing ? `Preferred timing: ${data.timing}` : '', data.details?.trim() ? `Project: ${data.details.trim().slice(0, 1500)}` : '', leadContext()].filter(Boolean).join('\n');
   const response = await request(INQUIRY_ENDPOINT, {
     method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify({ source: 'qcb', name: data.name.trim(), phone: data.phone.trim(), zip: data.zip.trim(), email: data.email.trim(),
+      ...(notes ? { message: notes } : {}),
       ...(configuration ? { inquiryType: 'cost_estimator', backsplash: configuration } : {}),
     }),
   });

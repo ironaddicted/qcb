@@ -80,8 +80,8 @@ const Header = () => (
           <Phone className="w-4 h-4 text-brand-teal" />
           (704) 750-9110
         </a>
-        <a href="/cost-estimator/" data-estimator-entry="header" className="bg-brand-teal text-white px-3 sm:px-5 py-3 rounded-full text-xs sm:text-sm font-semibold text-center hover:bg-brand-teal/90 transition-all shadow-lg shadow-brand-teal/20">
-          Online Cost Estimator
+        <a href="#estimate" onClick={() => trackQuoteCtaClick('header')} className="bg-brand-teal text-white px-3 sm:px-5 py-3 rounded-full text-xs sm:text-sm font-semibold text-center hover:bg-brand-teal/90 transition-all shadow-lg shadow-brand-teal/20">
+          Free Personal Quote
         </a>
       </div>
     </div>

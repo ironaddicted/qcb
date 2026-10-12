@@ -3,7 +3,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 const ts = require('typescript');
-const context = { exports: {} };
+const context = { exports: {}, require: () => ({ leadContext: () => '' }) };
 vm.runInNewContext(ts.transpileModule(fs.readFileSync(__dirname + '/inquiry.ts', 'utf8'), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 }).outputText, context);
@@ -36,6 +36,14 @@ test('HTTP errors, opaque responses, and network errors never resolve as success
     await assert.rejects(submitInquiry(data, async () => response));
   }
   await assert.rejects(submitInquiry(data, async () => { throw Error('Network failed'); }));
+});
+
+test('optional qualification notes accompany the inquiry without changing the contact-only path', async () => {
+  await submitInquiry({ ...data, timing: 'Within 1–3 months', details: ' Existing tile to remove ' }, async (_url, options) => {
+    const payload = JSON.parse(options.body);
+    assert.equal(payload.message, 'Preferred timing: Within 1–3 months\nProject: Existing tile to remove');
+    return { ok: true };
+  });
 });
 
 test('configured quotes send contact fields and the complete builder details to the existing Lambda', async () => {
