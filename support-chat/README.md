@@ -14,7 +14,7 @@ Starts in explicitly labeled guided mode. AI requires an OpenAI API account with
 - Signed brand-bound conversation token kept in browser memory; 20 messages and 30-day expiry.
 - 600 characters per message; 3KB request body; 8 requests/minute and 80/day per hashed network address across both brands; 5 new sessions/day per address. Shared household networks may encounter the same limit.
 - Global 1500 requests/day; six concurrent backend requests, two concurrent model requests; network/model timeouts.
-- Model output limited to 64 tokens; model only returns an allowed FAQ ID or NONE. Unknown/malformed output is rejected. Guided responses available on model failure or allowance exhaustion.
+- Model generation limited to 2048 tokens, including internal reasoning; model only returns an allowed FAQ ID or NONE. Unknown/malformed output is rejected. Guided responses available on model failure or allowance exhaustion.
 - 1000 reserved model calls per UTC calendar month. At a conservative $0.01 reservation/call this is a $10 planning allowance for the configured model, not an account-wide provider billing limit. Failed calls retain their reservation. Recheck rates before changing models. The setup connection check is outside this small runtime allowance.
 - SQL parameters and plain-text DOM rendering; same-origin checks; trusted Apache overwrite of forwarded host/network headers. Automated clients can spoof their own Origin, so rate, concurrency, fixed answer coverage, and global bounds are essential.
 
