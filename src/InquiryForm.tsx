@@ -16,6 +16,22 @@ export default function InquiryForm({ configuration, onEstimatorEvent }: { confi
   const locked = useRef(false);
   const started = useRef(false);
   const errorSummary = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    try {
+      const pendingChat = sessionStorage.getItem('qcb-chat-quote');
+      if (pendingChat) {
+        sessionStorage.removeItem('qcb-chat-quote');
+        setData(current => ({ ...current, details: [current.details, pendingChat.slice(0, 1200)].filter(Boolean).join('\n').slice(0, 1500) }));
+      }
+    } catch { /* Quote requests remain available when browser storage is disabled. */ }
+    const attachChat = (event: Event) => {
+      const details = (event as CustomEvent<{ details?: string }>).detail?.details;
+      if (typeof details !== 'string') return;
+      setData(current => ({ ...current, details: [current.details, details].filter(Boolean).join('\n').slice(0, 1500) }));
+    };
+    window.addEventListener('project-chat-quote', attachChat);
+    return () => window.removeEventListener('project-chat-quote', attachChat);
+  }, []);
 
   const formRoot = useRef<HTMLElement>(null);
   const viewed = useRef(false);

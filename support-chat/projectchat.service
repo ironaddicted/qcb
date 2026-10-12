@@ -1,0 +1,23 @@
+[Unit]
+Description=VAD and QCB restricted project chat
+After=network-online.target postgresql.service
+Requires=postgresql.service
+
+[Service]
+User=projectchat
+Group=projectchat
+WorkingDirectory=/opt/projectchat
+EnvironmentFile=/etc/projectchat.env
+ExecStart=/usr/bin/python3 /opt/projectchat/server.py
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+MemoryMax=120M
+TasksMax=20
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target
