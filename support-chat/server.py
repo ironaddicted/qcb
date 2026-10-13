@@ -115,8 +115,16 @@ class Handler(BaseHTTPRequestHandler):
                 if self.path=='/api/project-chat/session':
                     if data.get('consent') is not True:
                         return self.reply(400, {'error':'Please accept the chat privacy notice first.'})
-                    if not throttle(conn,'sessions:'+hashed,5,86400):
-                        return self.reply(429, {'error':'Please use the quote form or call/text us.'})
+                    previous_cid=valid_token(data.get('token'),brand)
+                    if previous_cid:
+                        with conn.cursor() as cur:
+                            cur.execute('SELECT id FROM conversations WHERE id=%s AND brand=%s AND expires_at>now() AND turns<20',(previous_cid,brand))
+                            resumable=cur.fetchone()
+                        if resumable:
+                            return self.reply(200, {'token':data['token'], 'reference':previous_cid, 'resumed':True,
+                                'mode':'ai' if os.environ.get('AI_ENABLED')=='1' and os.environ.get('OPENAI_API_KEY') else 'guided'})
+                    if not throttle(conn,'sessions:'+hashed,20,86400):
+                        return self.reply(429, {'error':'Too many new chats from this network today. Please use the quote form or call/text (704) 750-9110.'})
                     cid=str(uuid.uuid4())
                     with conn.cursor() as cur: cur.execute('INSERT INTO conversations(id,brand) VALUES(%s,%s)',(cid,brand))
                     conn.commit()
