@@ -123,7 +123,7 @@ class Handler(BaseHTTPRequestHandler):
                         if resumable:
                             return self.reply(200, {'token':data['token'], 'reference':previous_cid, 'resumed':True,
                                 'mode':'ai' if os.environ.get('AI_ENABLED')=='1' and os.environ.get('OPENAI_API_KEY') else 'guided'})
-                    if not throttle(conn,'sessions:'+hashed,20,86400):
+                    if not throttle(conn,'sessions:'+hashed,50,86400):
                         return self.reply(429, {'error':'Too many new chats from this network today. Please use the quote form or call/text (704) 750-9110.'})
                     cid=str(uuid.uuid4())
                     with conn.cursor() as cur: cur.execute('INSERT INTO conversations(id,brand) VALUES(%s,%s)',(cid,brand))
